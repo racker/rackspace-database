@@ -1,0 +1,13 @@
+# Ingore Vim Shrapnel 
+.*.sw[a-z]
+*.un~
+Session.vim
+*~
+
+# Ignore Python Shrapnel
+*.py[co]
+
+
+## Ignore forbidden information (passwords, keys, etc.)
+
+forbidden/
