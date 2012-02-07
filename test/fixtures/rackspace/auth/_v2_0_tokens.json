@@ -1,0 +1,64 @@
+{
+    "access": {
+        "token": {
+            "id": "1111-1111-1111-111",
+            "expires": "2011-12-12T21:01:03.000-06:00"
+        },
+        "serviceCatalog": [
+            {
+                "endpoints": [
+                    {
+                        "region": "ORD",
+                        "tenantId": "MossoCloudFS_1111-11111-1111-111",
+                        "publicURL": "https://cdn2.clouddrive.com/v1/MossoCloudFS_1111-11111-1111-111",
+                        "version": {
+                            "versionInfo": "https://cdn2.clouddrive.com/v1/",
+                            "versionList": "https://cdn2.clouddrive.com/",
+                            "versionId": "1"
+                        }
+                    }
+                ],
+                "name": "cloudFilesCDN",
+                "type": "object-store"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region": "ORD",
+                        "tenantId": "MossoCloudFS_1111-11111-1111-111",
+                        "publicURL": "https://storage101.ord1.clouddrive.com/v1/MossoCloudFS_1111-11111-1111-111",
+                        "internalURL": "https://snet-storage101.ord1.clouddrive.com/v1/MossoCloudFS_1111-11111-1111-111"
+                    }
+                ],
+                "name": "cloudFiles",
+                "type": "object-store"
+            },
+            {
+                "endpoints": [
+                    {
+                        "tenantId": "23213",
+                        "publicURL": "https://servers.api.rackspacecloud.com/v1.0/23213",
+                        "version": {
+                            "versionInfo": "https://servers.api.rackspacecloud.com/v1.0/",
+                            "versionList": "https://servers.api.rackspacecloud.com/",
+                            "versionId": "1.0"
+                        }
+                    }
+                ],
+                "name": "cloudServers",
+                "type": "compute"
+            }
+        ],
+        "user": {
+            "id": "84268",
+            "roles": [
+                {
+                    "id": "identity:default",
+                    "description": "Default Role.",
+                    "name": "identity:default"
+                }
+            ],
+            "name": "kamislo"
+        }
+    }
+}
