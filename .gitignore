@@ -11,3 +11,5 @@ Session.vim
 ## Ignore forbidden information (passwords, keys, etc.)
 
 forbidden/
+test/secrets.py
+
