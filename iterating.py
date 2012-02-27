@@ -26,7 +26,7 @@ def auth_to_service(service_auth_url, rack_user, rack_api_key):
 
 		return (regionalized_endpoints, account_id, token_id, token_expiration)
 	else:
-		raise StandardError("Failed to auth with status code %d" % resp.status_code)
+		raise StandardError("Failed to auth with status code %d with %s" % (resp.status_code, resp.content))
 
 def gen_rack_api_v1_0_compatible_headers(account_id, token_id):
 	return {
@@ -67,34 +67,34 @@ API_OPERATIONS = [
 		#
 		# method name						REST endpoint				  method response namespace
 		# API Versions
-		['list_apis',						'/',							'get', 'versions'],
-		['show_api',						'/{0}',							'get', 'version'],
+		['list_apis',						'/',							'get'],#, 'versions'],
+		['show_api',						'/{0}',							'get'],#, 'version'],
 
 		# Database Instances
-		['create_instance',					'/instances',					'post', 'instance'],
-		['list_instances',					'/instances',					'get',	'instances'],
-		['list_instances_details',			'/instances/detail',			'get',	'instances'],
-		['show_instance',					'/instances/{0}',				'get',	'instance'],
+		['create_instance',					'/instances',					'post'],#, 'instance'],
+		['list_instances',					'/instances',					'get'],#,	'instances'], # -
+		['list_instances_details',			'/instances/detail',			'get'],#,	'instances'], # *
+		['show_instance',					'/instances/{0}',				'get'],#,	'instance'],
 		['destroy_instance',				'/instances/{0}',				'delete'],
 
 		# Databases
 		['create_instance_database',		'/instances/{0}/databases',		'post'],
-		['list_instance_databases',			'/instances/{0}/databases',		'get',	'databases'],
+		['list_instance_databases',			'/instances/{0}/databases',		'get'],#,	'databases'],
 		['destroy_instance_database',		'/instances/{0}/databases/{1}',	'delete'],
 
 		# Users
 		['create_instance_user',			'/instances/{0}/users',			'post'],
-		['list_instance_users',				'/instances/{0}/users',			'get',	'users'],
+		['list_instance_users',				'/instances/{0}/users',			'get'],#,	'users'],
 		['destroy_instance_user',			'/instances/{0}/users/{1}',		'delete'],
 
 		# Flavors
-		['list_flavors',					'/flavors',						'get',	'flavors'],
-		['list_flavors_details',			'/flavors/detail',				'get',	'flavors'],
-		['show_flavor',						'/flavors/{0}',					'get',	'flavor'],
+		['list_flavors',					'/flavors',						'get'],#,	'flavors'], # -
+		['list_flavors_details',			'/flavors/detail',				'get'],#,	'flavors'], # *
+		['show_flavor',						'/flavors/{0}',					'get'],#,	'flavor'],
 
 		# Root Flag
-		['enable_instance_root',			'/instances/{0}/root',			'post',	'user'],
-		['enabled_instance_root',			'/instances/{0}/root',			'get',	'rootEnabled']
+		['enable_instance_root',			'/instances/{0}/root',			'post'],#,	'user'],
+		['enabled_instance_root',			'/instances/{0}/root',			'get']#,	'rootEnabled']
 ]
 
 
