@@ -1,0 +1,37 @@
+{
+    "auth": {
+        "serviceCatalog": {
+            "cloudFiles": [
+                {
+                    "internalURL": "https://snet-storage101.ord1.clouddrive.com/v1/MossoCloudFS_82c36485-9599-41f8-9a34-a2bacf967c3b", 
+                    "publicURL": "https://storage101.ord1.clouddrive.com/v1/MossoCloudFS_82c36485-9599-41f8-9a34-a2bacf967c3b", 
+                    "region": "ORD", 
+                    "v1Default": true
+                }
+            ], 
+            "cloudFilesCDN": [
+                {
+                    "publicURL": "https://cdn2.clouddrive.com/v1/MossoCloudFS_82c36485-9599-41f8-9a34-a2bacf967c3b", 
+                    "region": "ORD", 
+                    "v1Default": true
+                }
+            ], 
+            "cloudServers": [
+                {
+                    "publicURL": "https://servers.api.rackspacecloud.com/v1.0/586067", 
+                    "v1Default": true
+                }
+            ], 
+            "cloudServersPreprod": [
+                {
+                    "publicURL": "https://preprod.dfw.servers.api.rackspacecloud.com/v2/586067", 
+                    "region": "DFW"
+                }
+            ]
+        }, 
+        "token": {
+            "expires": "2012-02-08T10:43:50.000-06:00", 
+            "id": "de3bf0c1-bf06-482d-bf6d-0d7a4174ef47"
+        }
+    }
+}

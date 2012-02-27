@@ -36,8 +36,8 @@
             {
                 "endpoints": [
                     {
-                        "tenantId": "23213",
-                        "publicURL": "https://servers.api.rackspacecloud.com/v1.0/23213",
+                        "tenantId": "586067",
+                        "publicURL": "https://servers.api.rackspacecloud.com/v1.0/586067",
                         "version": {
                             "versionInfo": "https://servers.api.rackspacecloud.com/v1.0/",
                             "versionList": "https://servers.api.rackspacecloud.com/",
