@@ -72,6 +72,11 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'create_instance not implemented for this driver')
 
+	def delete_instance(self, instance_id):
+		raise NotImplementedError(
+			'delete_instance not implemented for this driver')
+
+
 
 	def list_flavors(self):
 		raise NotImplementedError(
