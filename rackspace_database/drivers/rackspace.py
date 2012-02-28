@@ -201,14 +201,14 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 		raise LibcloudError('Unexpected status code: %s (url=%s, details=%s)' %
 							(response.status, value_dict['url'], details))
 
-	def _post_request(self, value_dict):
+	def _request(self, value_dict, method):
 		key = None
 
 		params = value_dict.get('params', {})
 		data = value_dict.get('data', {})
 		url = value_dict.get('url')
 
-		response = self.connection.request(url, method='POST', data=data, params=params)
+		response = self.connection.request(url, method=method, data=data, params=params)
 
 		# newdata, self._last_key, self._exhausted
 		if response.status == httplib.NO_CONTENT:
@@ -233,6 +233,9 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 		details = body['details'] if 'details' in body else ''
 		raise LibcloudError('Unexpected status code: %s (url=%s, details=%s)' %
 							(response.status, value_dict['url'], details))
+
+	def _post_request(self, value_dict):
+		return self._request(value_dict, 'POST')
 
 
 	def _to_instance(self, obj, value_dict):
