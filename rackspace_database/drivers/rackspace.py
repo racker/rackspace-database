@@ -210,7 +210,6 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 
 		response = self.connection.request(url, method=method, data=data, params=params)
 
-		# newdata, self._last_key, self._exhausted
 		if response.status == httplib.NO_CONTENT:
 			return []
 		elif response.status == httplib.OK:
@@ -236,6 +235,9 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 
 	def _post_request(self, value_dict):
 		return self._request(value_dict, 'POST')
+
+	def _delete_request(self, value_dict):
+		return self._request(value_dict, 'DELETE')
 
 
 	def _to_instance(self, obj, value_dict):
@@ -267,8 +269,11 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 				'namespace' : 'instance',
 				'data' : data,
 				'object_mapper' : self._to_instance}
-		return self._post_request(value_dict), data
+		return self._post_request(value_dict)
 
+	def delete_instance(self, instance_id):
+		value_dict = {'url' : '/instances/%s' % instance_id}
+		return self._delete_request(value_dict)
 
 	def _to_flavor(self, obj, value_dict):
 		for link in obj['links']:

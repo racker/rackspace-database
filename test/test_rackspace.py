@@ -17,6 +17,10 @@ import sys
 import os
 import unittest
 from os.path import join as pjoin
+try:
+	import simplejson as json
+except:
+	import json
 
 from libcloud.utils.py3 import httplib, urlparse
 
@@ -73,18 +77,11 @@ class RackspaceTests(unittest.TestCase):
 
 	def test_delete_instance(self):
 		result = self.driver.delete_instance('68345c52')
-		self.assertEqual(result, '')
+		self.assertEqual(result, [])
 
 	def test_create_instance(self):
 		flavorRef = "http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/1"
-		result,data = self.driver.create_instance(flavorRef, 2, name='a_rack_instance')
-
-		self.assertEqual(data, { 'instance' : {
-			'flavorRef' : flavorRef,
-			'volume' : {'size' : 2},
-			'name' : 'a_rack_instance'
-		}})
-
+		result = self.driver.create_instance(flavorRef, 2, name='a_rack_instance')
 		self.assertEqual(result.name, 'a_rack_instance')
 
 class RackspaceMockHttp(MockHttpTestCase):
@@ -104,17 +101,27 @@ class RackspaceMockHttp(MockHttpTestCase):
 
 	def _586067_instances_68345c52(self, method, url, body, headers):
 		if method == 'DELETE':
-			body = ''
+			self.assertEqual(body, {})
 			return (httplib.NO_CONTENT, body, self.json_content_headers,
 					httplib.responses[httplib.NO_CONTENT])
-		else:
+		elif method == 'GET':
 			body = self.fixtures.load('get_instance.json')
 			return (httplib.OK, body, self.json_content_headers,
 					httplib.responses[httplib.OK])
 
+		raise NotImplementedError('')
+
 	def _586067_instances(self, method, url, body, headers):
-		body = self.fixtures.load('get_instance.json')
 		if method == 'POST':
+			flavorRef = ''.join(["http://ord.databases.api.",
+				"rackspacecloud.com/v1.0/586067/flavors/1"])
+			data = { 'instance' : {
+				'flavorRef' : flavorRef,
+				'volume' : {'size' : 2},
+				'name' : 'a_rack_instance'
+			}}
+			self.assertEqual(json.loads(body), data)
+			body = self.fixtures.load('get_instance.json')
 			return (httplib.OK, body, self.json_content_headers,
 					httplib.responses[httplib.OK])
 
