@@ -71,6 +71,10 @@ class RackspaceTests(unittest.TestCase):
 		self.assertEqual(results[0].link,
 			"http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/3")
 
+	def test_delete_instance(self):
+		result = self.driver.delete_instance('68345c52')
+		self.assertEqual(result, '')
+
 	def test_create_instance(self):
 		flavorRef = "http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/1"
 		result,data = self.driver.create_instance(flavorRef, 2, name='a_rack_instance')
@@ -99,15 +103,20 @@ class RackspaceMockHttp(MockHttpTestCase):
 				httplib.responses[httplib.OK])
 
 	def _586067_instances_68345c52(self, method, url, body, headers):
-		body = self.fixtures.load('get_instance.json')
-		return (httplib.OK, body, self.json_content_headers,
-				httplib.responses[httplib.OK])
+		if method == 'DELETE':
+			body = ''
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
+		else:
+			body = self.fixtures.load('get_instance.json')
+			return (httplib.OK, body, self.json_content_headers,
+					httplib.responses[httplib.OK])
 
 	def _586067_instances(self, method, url, body, headers):
 		body = self.fixtures.load('get_instance.json')
 		if method == 'POST':
 			return (httplib.OK, body, self.json_content_headers,
-					httplib.responses[httplib.NO_CONTENT])
+					httplib.responses[httplib.OK])
 
 		raise NotImplementedError('')
 
