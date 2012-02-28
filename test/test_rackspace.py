@@ -71,6 +71,12 @@ class RackspaceTests(unittest.TestCase):
 		self.assertEqual(results[0].link,
 			"http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/3")
 
+	def test_create_instance(self):
+		flavorRef = "http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/1"
+		result = self.driver.create_instance(flavorRef, 2, instance_name='an_instance')
+
+		self.assertEqual(result.name, 'a_rack_instance')
+
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
 	fixtures = DatabaseFileFixtures('rackspace/v1.0')

@@ -57,18 +57,24 @@ class DatabaseDriver(object):
 		self.connection.driver = self
 		self.connection.connect()
 
-		def _ex_connection_class_kwargs(self):
-			return {}
+	def _ex_connection_class_kwargs(self):
+		return {}
 
-		def list_instances(self):
-			raise NotImplementedError(
-				'list_instances not implemented for this driver')
+	def list_instances(self):
+		raise NotImplementedError(
+			'list_instances not implemented for this driver')
 
-		def get_instance(self, instance_id):
-			raise NotImplementedError(
-				'get_instance not implemented for this driver')
+	def get_instance(self, instance_id):
+		raise NotImplementedError(
+			'get_instance not implemented for this driver')
 
-		def list_flavors(self):
-			raise NotImplementedError(
-				'list_flavors not implemented for this driver')
+	def create_instance(self, flavorLink, size, **kwargs):
+		raise NotImplementedError(
+			'create_instance not implemented for this driver')
+
+
+	def list_flavors(self):
+		raise NotImplementedError(
+			'list_flavors not implemented for this driver')
+
 
