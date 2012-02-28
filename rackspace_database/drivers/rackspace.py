@@ -201,6 +201,40 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 		raise LibcloudError('Unexpected status code: %s (url=%s, details=%s)' %
 							(response.status, value_dict['url'], details))
 
+	def _post_request(self, value_dict):
+		key = None
+
+		params = value_dict.get('params', {})
+		data = value_dict.get('data', {})
+		url = value_dict.get('url')
+
+		response = self.connection.request(url, method='POST', data=data, params=params)
+
+		# newdata, self._last_key, self._exhausted
+		if response.status == httplib.NO_CONTENT:
+			return []
+		elif response.status == httplib.OK:
+			resp = json.loads(response.body)
+			l = None
+
+			if 'namespace' in value_dict:
+				resp = resp[value_dict['namespace']]
+
+			if 'list_item_mapper' in value_dict:
+				func = value_dict['list_item_mapper']
+				l = [func(x, value_dict) for x in resp]
+			else:
+				l = value_dict['object_mapper'](resp, value_dict)
+
+			return l
+
+		body = json.loads(response.body)
+
+		details = body['details'] if 'details' in body else ''
+		raise LibcloudError('Unexpected status code: %s (url=%s, details=%s)' %
+							(response.status, value_dict['url'], details))
+
+
 	def _to_instance(self, obj, value_dict):
 		status = InstanceStatus.__dict__[obj['status']]
 		return Instance(obj['id'], obj['name'], status)
@@ -218,6 +252,20 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 				'object_mapper' : self._to_instance}
 		return self._get_request(value_dict)
 
+	def create_instance(self, flavorRef, size, **kwargs):
+		data = {
+			'flavorRef' : flavorRef,
+			'volume' : { 'size' : size },
+		}
+		data.update(kwargs)
+		data = {'instance' : data}
+
+		value_dict = {'url' : '/instances',
+				'namespace' : 'instance',
+				'data' : data,
+				'object_mapper' : self._to_instance}
+		return self._post_request(value_dict), data
+
 
 	def _to_flavor(self, obj, value_dict):
 		for link in obj['links']:
@@ -232,6 +280,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 				'namespace' : 'flavors',
 				'list_item_mapper' : self._to_flavor}
 		return self._get_request(value_dict)
+
 
 
 

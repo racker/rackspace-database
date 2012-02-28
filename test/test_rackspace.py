@@ -73,7 +73,13 @@ class RackspaceTests(unittest.TestCase):
 
 	def test_create_instance(self):
 		flavorRef = "http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/1"
-		result = self.driver.create_instance(flavorRef, 2, instance_name='an_instance')
+		result,data = self.driver.create_instance(flavorRef, 2, name='a_rack_instance')
+
+		self.assertEqual(data, { 'instance' : {
+			'flavorRef' : flavorRef,
+			'volume' : {'size' : 2},
+			'name' : 'a_rack_instance'
+		}})
 
 		self.assertEqual(result.name, 'a_rack_instance')
 
@@ -97,21 +103,20 @@ class RackspaceMockHttp(MockHttpTestCase):
 		return (httplib.OK, body, self.json_content_headers,
 				httplib.responses[httplib.OK])
 
+	def _586067_instances(self, method, url, body, headers):
+		body = self.fixtures.load('get_instance.json')
+		if method == 'POST':
+			return (httplib.OK, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
+
+		raise NotImplementedError('')
+
 	def _586067_flavors_detail(self, method, url, body, headers):
 		body = self.fixtures.load('list_flavors.json')
 		return (httplib.OK, body, self.json_content_headers,
 				httplib.responses[httplib.OK])
 
 
-	'''
-	def _23213_notification_plans_npIXxOAn5(self, method, url, body, headers):
-		if method == 'DELETE':
-			body = ''
-			return (httplib.NO_CONTENT, body, self.json_content_headers,
-					httplib.responses[httplib.NO_CONTENT])
-
-		raise NotImplementedError('')
-	'''
 
 
 if __name__ == '__main__':
