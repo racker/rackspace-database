@@ -31,7 +31,7 @@ def auth_to_service(service_auth_url, rack_user, rack_api_key):
 def gen_rack_api_v1_0_compatible_headers(account_id, token_id):
 	return {
 		"X-Auth-Token" : token_id,
-		"X-Auth-Project-ID" : account_id
+		#"X-Auth-Project-ID" : account_id
 	}
 
 def gen_curried_api_generator_function(regionalized_endpoint_public_url, headers, dict):

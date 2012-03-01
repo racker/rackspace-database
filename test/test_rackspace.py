@@ -25,7 +25,7 @@ except:
 from libcloud.utils.py3 import httplib, urlparse
 
 from rackspace_database.base import (DatabaseDriver, Instance,
-								InstanceStatus, Flavor)
+								InstanceStatus, Flavor, Database, User)
 
 from rackspace_database.drivers.rackspace import (RackspaceDatabaseDriver,
 											RackspaceDatabaseValidationError)
@@ -61,28 +61,71 @@ class RackspaceTests(unittest.TestCase):
 		result = list(self.driver.list_instances())
 		self.assertEqual(len(result), 2)
 		self.assertEqual(result[0].id, '68345c52')
+		self.assertEqual(result[0].databases, None)
 		self.assertEqual(result[1].id, '12345c52')
+		self.assertEqual(result[1].databases, None)
 
 	def test_get_instance(self):
+		flavorRef = ("http://ord.databases.api." +
+			"rackspacecloud.com/v1.0/586067/flavors/1")
+		databases=[
+				Database(name='nextround',collate='utf8_general_ci',
+					character_set='utf8'),
+				Database(name='sampledb', collate='utf8_general_ci',
+					character_set='utf8')
+		]
+		i = Instance(flavorRef, 2, name='a_rack_instance',
+				id='68345c52', databases=databases,
+				status=InstanceStatus.ACTIVE)
+
 		result = self.driver.get_instance('68345c52')
-		self.assertEqual(result.id, '68345c52')
+		self.assertEqual(result.flavorRef, i.flavorRef)
+		self.assertEqual(result.name, i.name)
+		self.assertEqual(result.status, i.status)
+		self.assertEqual(result.id, i.id)
+		self.assertEqual(str(result.databases[0]),
+				str(i.databases[0]))
+		self.assertEqual(str(result.databases[1]),
+				str(i.databases[1]))
 
 	def test_list_flavors(self):
 		results = self.driver.list_flavors()
 		self.assertEqual(len(results), 4)
 		self.assertEqual(results[0].id, 3)
 		self.assertEqual(results[0].ram, 2048)
-		self.assertEqual(results[0].link,
+		self.assertEqual(results[0].href,
 			"http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/3")
+
+	def test_get_instance(self):
+		href = ("http://ord.databases.api." +
+			"rackspacecloud.com/v1.0/586067/flavors/3")
+		f = Flavor(3, 'm1.medium', 1, 2048, href)
+		result = self.driver.get_flavor(3)
+		self.assertEqual(result.id, f.id)
+		self.assertEqual(result.name, f.name)
+		self.assertEqual(result.vcpus, f.vcpus)
+		self.assertEqual(result.ram, f.ram)
+		self.assertEqual(result.href, f.href)
 
 	def test_delete_instance(self):
 		result = self.driver.delete_instance('68345c52')
 		self.assertEqual(result, [])
 
-	def test_create_instance(self):
+	def test_create_instance_with_databases(self):
 		flavorRef = "http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/1"
-		result = self.driver.create_instance(flavorRef, 2, name='a_rack_instance')
+		databases = [Database('some_database'),
+				Database('another_database', character_set='utf8')]
+		i = Instance(flavorRef, 2, name='a_rack_instance', databases=databases)
+		result = self.driver.create_instance(i)
 		self.assertEqual(result.name, 'a_rack_instance')
+
+	def test_restart_instance(self):
+		result = self.driver.restart_instance('123456')
+		self.assertEqual(result, [])
+
+	def test_resize_instance(self):
+		result = self.driver.resize_instance('1234567', 4)
+		self.assertEqual(result, [])
 
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -113,24 +156,54 @@ class RackspaceMockHttp(MockHttpTestCase):
 
 	def _586067_instances(self, method, url, body, headers):
 		if method == 'POST':
-			flavorRef = ''.join(["http://ord.databases.api.",
-				"rackspacecloud.com/v1.0/586067/flavors/1"])
+			flavorRef = ("http://ord.databases.api." +
+				"rackspacecloud.com/v1.0/586067/flavors/1")
 			data = { 'instance' : {
 				'flavorRef' : flavorRef,
 				'volume' : {'size' : 2},
-				'name' : 'a_rack_instance'
+				'name' : 'a_rack_instance',
+				'databases' : [
+					{'name' : 'some_database'},
+					{'name' : 'another_database',
+						'character_set' : 'utf8'}
+					]
 			}}
 			self.assertEqual(json.loads(body), data)
-			body = self.fixtures.load('get_instance.json')
+			body = self.fixtures.load('create_instance_response.json')
 			return (httplib.OK, body, self.json_content_headers,
 					httplib.responses[httplib.OK])
 
 		raise NotImplementedError('')
 
+	def _586067_instances_123456_action(self, method, url, body, headers):
+		if method == 'POST':
+			self.assertTrue(json.loads(body), {'restart' : {}})
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
+
+		raise NotImplementedError('')
+
+	def _586067_instances_1234567_action(self, method, url, body, headers):
+		if method == 'POST':
+			self.assertEqual(json.loads(body), {'resize':{'volume':{'size':4}}})
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
+
+		raise NotImplementedError('')
+
 	def _586067_flavors_detail(self, method, url, body, headers):
-		body = self.fixtures.load('list_flavors.json')
-		return (httplib.OK, body, self.json_content_headers,
-				httplib.responses[httplib.OK])
+		if method == 'GET':
+			body = self.fixtures.load('list_flavors.json')
+			return (httplib.OK, body, self.json_content_headers,
+					httplib.responses[httplib.OK])
+		raise NotImplementedError('')
+
+	def _586067_flavors_3(self, method, url, body, headers):
+		if method == 'GET':
+			body = self.fixtures.load('get_flavor.json')
+			return (httplib.OK, body, self.json_content_headers,
+					httplib.responses[httplib.OK])
+		raise NotImplementedError('')
 
 
 

@@ -8,25 +8,47 @@ class InstanceStatus(object):
 	FAILED = 4
 
 class Instance(object):
-	def __init__(self, id, name, status):
-		self.id = id
-		self.name = name
-		self.status = status
+	def __init__(self, flavorRef, size, **kwargs):
+		self.id = kwargs.get('id')
+		self.name = kwargs.get('name')
+		self.status = kwargs.get('status')
+		self.size = size
+		self.flavorRef = flavorRef
+		self.databases = kwargs.get('databases')
 
 	def __repr__(self):
-		return ("<Instance: id=%s, name=%s, status=%s >" % (self.id, self.name, self.status))
+		return (("<Instance: id=%s, name=%s, status=%d," +
+				"size=%d, flavorRef=%s, databases=%s >") %
+				(self.id, self.name, self.status, self.size,
+					self.flavorRef, self.databases))
+
+class Database(object):
+	def __init__(self, name, character_set=None, collate=None):
+		self.name = name
+		self.character_set = character_set
+		self.collate = collate
+
+	def __repr__(self):
+		return ("<Database: name=%s, character=%s, collate=%s >" % (self.name, self.character_set, self.collate))
 
 class Flavor(object):
-	def __init__(self, id, name, vcpus, ram, link):
+	def __init__(self, id, name, vcpus, ram, href):
 		self.id = id
 		self.name = name
 		self.vcpus = vcpus
 		self.ram = ram
-		self.link = link
+		self.href = href
 
 	def __repr__(self):
-		return ("<Flavor: id=%s, name=%s, vcpus=%d, ram=%d, link=%s >" % (self.id, self.name, self.vcpus, self.ram, self.link))
+		return ("<Flavor: id=%d, name=%s, vcpus=%d, ram=%d, link=%s >" % (self.id, self.name, self.vcpus, self.ram, self.href))
 
+class User(object):
+	def __init__(self, name, password=None):
+		self.name = name
+		self.password = password
+
+	def __repr__(self):
+		return ("<User: name=%s, password=%s >" % (self.name, self.password))
 
 class DatabaseDriver(object):
 	"""
@@ -80,4 +102,15 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'list_flavors not implemented for this driver')
 
+	def get_flavor(self, flavor_id):
+		raise NotImplementedError(
+			'get_flavor not implemented for this driver')
+
+	def restart_instance(self, instance_id):
+		raise NotImplementedError(
+			'restart_instance not implemented for this driver')
+
+	def resize_instance(self, instance_id, size):
+		raise NotImplementedError(
+			'resize_instance not implemented for this driver')
 

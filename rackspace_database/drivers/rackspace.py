@@ -27,7 +27,7 @@ from libcloud.common.base import Response
 
 from rackspace_database.providers import Provider
 from rackspace_database.base import (DatabaseDriver, Instance,
-							InstanceStatus, Flavor)
+							InstanceStatus, Flavor, Database, User)
 
 from libcloud.common.rackspace import AUTH_URL_US
 from libcloud.common.openstack import OpenStackBaseConnection
@@ -239,10 +239,65 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 	def _delete_request(self, value_dict):
 		return self._request(value_dict, 'DELETE')
 
+	def __extract_flavor_ref(self, obj):
+		for link in obj['links']:
+			if link['rel'] == 'self':
+				return link['href']
+
+	def _to_database(self, obj, value_dict):
+		return Database(obj['name'],
+				character_set = obj.get('character_set', None),
+				collate = obj.get('collate', None))
+
+	def _from_database(self, database):
+		d = dict()
+		d['name'] = database.name
+		if database.character_set:
+			d['character_set'] = database.character_set
+		if database.collate:
+			d['collate'] = database.collate
+		return d
+
 
 	def _to_instance(self, obj, value_dict):
 		status = InstanceStatus.__dict__[obj['status']]
-		return Instance(obj['id'], obj['name'], status)
+		flavorRef = self.__extract_flavor_ref(obj['flavor'])
+		if obj.get('databases'):
+			databases = [self._to_database(d, value_dict) for d
+				in obj.get('databases', [])]
+		else:
+			databases = None
+		return Instance(flavorRef, obj['volume']['size'], id=obj['id'], name=obj['name'], status=status, databases=databases)
+
+	def _from_instance(self, instance):
+		d = {
+			'flavorRef': instance.flavorRef,
+			'volume' : {'size' : instance.size}
+		}
+		if instance.id:
+			d['id'] = instance.id
+		if instance.name:
+			d['name'] = instance.name
+		if instance.databases:
+			d['databases'] = [self._from_database(x)
+					for x in instance.databases]
+		return d
+
+	def _to_flavor(self, obj, value_dict):
+		href = self.__extract_flavor_ref(obj)
+		return Flavor(obj['id'], obj['name'],
+				obj['vcpus'], obj['ram'], href)
+
+	def _to_user(self, obj, value_dict):
+		return User(obj['name'], password=obj.get('password', None))
+
+	def _from_user(self, user):
+		d = dict()
+		d['name'] = user.name
+		if user.password:
+			d['password'] = user.password
+		return d
+
 
 
 	def list_instances(self):
@@ -257,17 +312,12 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 				'object_mapper' : self._to_instance}
 		return self._get_request(value_dict)
 
-	def create_instance(self, flavorRef, size, **kwargs):
-		data = {
-			'flavorRef' : flavorRef,
-			'volume' : { 'size' : size },
-		}
-		data.update(kwargs)
-		data = {'instance' : data}
+	def create_instance(self, instance):
+		data = self._from_instance(instance)
 
 		value_dict = {'url' : '/instances',
 				'namespace' : 'instance',
-				'data' : data,
+				'data' : {'instance' : data},
 				'object_mapper' : self._to_instance}
 		return self._post_request(value_dict)
 
@@ -275,13 +325,18 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 		value_dict = {'url' : '/instances/%s' % instance_id}
 		return self._delete_request(value_dict)
 
-	def _to_flavor(self, obj, value_dict):
-		for link in obj['links']:
-			if link['rel'] == 'self':
-				href = link['href']
+	def restart_instance(self, instance_id):
+		data = {'restart' : {}}
+		value_dict = {'url' : '/instances/%s/action' % instance_id,
+				'data' : data}
+		return self._post_request(value_dict)
 
-		return Flavor(obj['id'], obj['name'],
-				obj['vcpus'], obj['ram'], href)
+	def resize_instance(self, instance_id, size):
+		data = {'resize' : { 'volume' : { 'size' : size } } }
+		value_dict = {'url' : '/instances/%s/action' % instance_id,
+				'data' : data}
+		return self._post_request(value_dict)
+
 
 	def list_flavors(self):
 		value_dict = {'url' : '/flavors/detail',
@@ -289,6 +344,11 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 				'list_item_mapper' : self._to_flavor}
 		return self._get_request(value_dict)
 
+	def get_flavor(self, flavor_id):
+		value_dict = { 'url' : '/flavors/%s' % flavor_id,
+				'namespace' : 'flavor',
+				'object_mapper' : self._to_flavor}
+		return self._get_request(value_dict)
 
 
 
