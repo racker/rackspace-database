@@ -15,12 +15,13 @@ class Instance(object):
 		self.size = size
 		self.flavorRef = flavorRef
 		self.databases = kwargs.get('databases')
+		self.rootEnabled = kwargs.get('rootEnabled')
 
 	def __repr__(self):
 		return (("<Instance: id=%s, name=%s, status=%d," +
-				"size=%d, flavorRef=%s, databases=%s >") %
+				"size=%d, flavorRef=%s, databases=%s, rootEnabled=%s >") %
 				(self.id, self.name, self.status, self.size,
-					self.flavorRef, self.databases))
+					self.flavorRef, self.databases, str(self.rootEnabled)))
 
 class Database(object):
 	def __init__(self, name, character_set=None, collate=None):

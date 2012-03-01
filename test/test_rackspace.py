@@ -62,10 +62,13 @@ class RackspaceTests(unittest.TestCase):
 		self.assertEqual(len(result), 2)
 		self.assertEqual(result[0].id, '68345c52')
 		self.assertEqual(result[0].databases, None)
+		self.assertEqual(result[0].rootEnabled, None)
 		self.assertEqual(result[1].id, '12345c52')
 		self.assertEqual(result[1].databases, None)
+		self.assertEqual(result[1].rootEnabled, None)
 
 	def test_get_instance(self):
+		self.assertTrue(False) # Y U NO FAIL??
 		flavorRef = ("http://ord.databases.api." +
 			"rackspacecloud.com/v1.0/586067/flavors/1")
 		databases=[
@@ -76,13 +79,14 @@ class RackspaceTests(unittest.TestCase):
 		]
 		i = Instance(flavorRef, 2, name='a_rack_instance',
 				id='68345c52', databases=databases,
-				status=InstanceStatus.ACTIVE)
-
+				status=InstanceStatus.ACTIVE, rootEnabled=False)
 		result = self.driver.get_instance('68345c52')
+
 		self.assertEqual(result.flavorRef, i.flavorRef)
 		self.assertEqual(result.name, i.name)
 		self.assertEqual(result.status, i.status)
 		self.assertEqual(result.id, i.id)
+		self.assertTrue(result.rootEnabled == i.rootEnabled)
 		self.assertEqual(str(result.databases[0]),
 				str(i.databases[0]))
 		self.assertEqual(str(result.databases[1]),
