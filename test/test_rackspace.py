@@ -68,7 +68,6 @@ class RackspaceTests(unittest.TestCase):
 		self.assertEqual(result[1].rootEnabled, None)
 
 	def test_get_instance(self):
-		self.assertTrue(False) # Y U NO FAIL??
 		flavorRef = ("http://ord.databases.api." +
 			"rackspacecloud.com/v1.0/586067/flavors/1")
 		databases=[
