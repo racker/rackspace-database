@@ -147,6 +147,10 @@ class RackspaceTests(unittest.TestCase):
 		self.assertEqual(str(results[0]), str(databases[0]))
 		self.assertEqual(str(results[1]), str(databases[1]))
 
+	def test_delete_database(self):
+		result = self.driver.delete_database('123456', 'adatabase')
+		self.assertEqual(result, [])
+
 
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -229,9 +233,16 @@ class RackspaceMockHttp(MockHttpTestCase):
 			body = self.fixtures.load('list_databases.json')
 			return (httplib.OK, body, self.json_content_headers,
 				httplib.responses[httplib.OK])
+		raise NotImplementedError('')
 
+	def _586067_instances_123456_databases_adatabase(self, method, url, body, headers):
+		if method == 'DELETE':
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
 
 		raise NotImplementedError('')
+
+
 
 	def _586067_flavors_detail(self, method, url, body, headers):
 		if method == 'GET':

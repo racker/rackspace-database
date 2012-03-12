@@ -123,4 +123,9 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'list_databases not implemented for this driver')
 
+	def delete_database(self, instance_id, database_name):
+		raise NotImplementedError(
+			'delete_database not implemented for this driver')
+
+
 
