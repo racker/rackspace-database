@@ -138,6 +138,16 @@ class RackspaceTests(unittest.TestCase):
 		result = self.driver.create_databases('123456', databases)
 		self.assertEqual(result, [])
 
+	def test_list_databases(self):
+		databases = [Database('a_database', character_set='utf8',
+				collate='utf8_general_ci'),
+				Database('another_database')]
+		results = self.driver.list_databases('123456')
+		self.assertEqual(len(results), 2)
+		self.assertEqual(str(results[0]), str(databases[0]))
+		self.assertEqual(str(results[1]), str(databases[1]))
+
+
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
 	fixtures = DatabaseFileFixtures('rackspace/v1.0')
@@ -215,6 +225,11 @@ class RackspaceMockHttp(MockHttpTestCase):
 			self.assertEqual(json.loads(body), data)
 			return (httplib.NO_CONTENT, body, self.json_content_headers,
 					httplib.responses[httplib.NO_CONTENT])
+		elif method == 'GET':
+			body = self.fixtures.load('list_databases.json')
+			return (httplib.OK, body, self.json_content_headers,
+				httplib.responses[httplib.OK])
+
 
 		raise NotImplementedError('')
 
