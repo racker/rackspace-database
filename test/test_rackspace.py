@@ -131,6 +131,13 @@ class RackspaceTests(unittest.TestCase):
 		result = self.driver.resize_instance('1234567', 4)
 		self.assertEqual(result, [])
 
+	def test_create_databases(self):
+		databases = [Database('a_database', character_set='utf8',
+				collate='utf8_general_ci'),
+				Database('another_database')]
+		result = self.driver.create_databases('123456', databases)
+		self.assertEqual(result, [])
+
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
 	fixtures = DatabaseFileFixtures('rackspace/v1.0')
@@ -181,7 +188,7 @@ class RackspaceMockHttp(MockHttpTestCase):
 
 	def _586067_instances_123456_action(self, method, url, body, headers):
 		if method == 'POST':
-			self.assertTrue(json.loads(body), {'restart' : {}})
+			self.assertEqual(json.loads(body), {'restart' : {}})
 			return (httplib.NO_CONTENT, body, self.json_content_headers,
 					httplib.responses[httplib.NO_CONTENT])
 
@@ -190,6 +197,22 @@ class RackspaceMockHttp(MockHttpTestCase):
 	def _586067_instances_1234567_action(self, method, url, body, headers):
 		if method == 'POST':
 			self.assertEqual(json.loads(body), {'resize':{'volume':{'size':4}}})
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
+
+		raise NotImplementedError('')
+
+	def _586067_instances_123456_databases(self, method, url, body, headers):
+		if method == 'POST':
+			data = { 'databases' : [
+					{	'character_set' : 'utf8',
+						'collate' : 'utf8_general_ci',
+						'name' : 'a_database'
+					},
+					{	'name' : 'another_database'
+					}
+				] }
+			self.assertEqual(json.loads(body), data)
 			return (httplib.NO_CONTENT, body, self.json_content_headers,
 					httplib.responses[httplib.NO_CONTENT])
 

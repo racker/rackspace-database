@@ -115,5 +115,8 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'resize_instance not implemented for this driver')
 
+	def create_databases(self, instance_id, databases):
+		raise NotImplementedError(
+			'create_database not implemented for this driver')
 
 
