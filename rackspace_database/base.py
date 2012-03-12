@@ -91,7 +91,7 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'get_instance not implemented for this driver')
 
-	def create_instance(self, flavorLink, size, **kwargs):
+	def create_instance(self, instance):
 		raise NotImplementedError(
 			'create_instance not implemented for this driver')
 
@@ -114,4 +114,6 @@ class DatabaseDriver(object):
 	def resize_instance(self, instance_id, size):
 		raise NotImplementedError(
 			'resize_instance not implemented for this driver')
+
+
 
