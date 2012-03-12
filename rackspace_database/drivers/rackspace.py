@@ -350,6 +350,11 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 				'data' : data}
 		return self._post_request(value_dict)
 
+	def list_databases(self, instance_id):
+		value_dict = {'url' : '/instances/%s/databases' % instance_id,
+				'namespace' : 'databases',
+				'list_item_mapper' : self._to_database}
+		return self._get_request(value_dict)
 
 	def list_flavors(self):
 		value_dict = {'url' : '/flavors/detail',

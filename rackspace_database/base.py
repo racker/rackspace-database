@@ -30,7 +30,7 @@ class Database(object):
 		self.collate = collate
 
 	def __repr__(self):
-		return ("<Database: name=%s, character=%s, collate=%s >" % (self.name, self.character_set, self.collate))
+		return ("<Database: name=%s, character_set=%s, collate=%s >" % (self.name, self.character_set, self.collate))
 
 class Flavor(object):
 	def __init__(self, id, name, vcpus, ram, href):

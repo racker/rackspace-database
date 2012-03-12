@@ -3,7 +3,7 @@
 		{
 			"name" : "a_database",
 			"character_set" : "utf8",
-			"collate" : "uft8_general_ci"
+			"collate" : "utf8_general_ci"
 		},
 		{
 			"name" : "another_database"
