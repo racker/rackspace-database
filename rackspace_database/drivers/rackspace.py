@@ -356,6 +356,12 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 				'list_item_mapper' : self._to_database}
 		return self._get_request(value_dict)
 
+	def delete_database(self, instance_id, database_name):
+		value_dict = {'url' : '/instances/%s/databases/%s' %
+				(instance_id, database_name)}
+		return self._delete_request(value_dict)
+
+
 	def list_flavors(self):
 		value_dict = {'url' : '/flavors/detail',
 				'namespace' : 'flavors',
