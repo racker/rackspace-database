@@ -57,6 +57,30 @@ class RackspaceTests(unittest.TestCase):
 												secret=RACKSPACE_PARAMS[1],
 				ex_force_base_url='http://www.todo.com')
 
+
+	def test_list_flavors(self):
+		results = self.driver.list_flavors()
+		self.assertEqual(len(results), 4)
+		self.assertEqual(results[0].id, 3)
+		self.assertEqual(results[0].ram, 2048)
+		self.assertEqual(results[0].href,
+			"http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/3")
+
+	def test_get_flavor(self):
+		href = ("http://ord.databases.api." +
+			"rackspacecloud.com/v1.0/586067/flavors/3")
+		f = Flavor(3, 'm1.medium', 1, 2048, href)
+		result = self.driver.get_flavor(3)
+		self.assertEqual(result.id, f.id)
+		self.assertEqual(result.name, f.name)
+		self.assertEqual(result.vcpus, f.vcpus)
+		self.assertEqual(result.ram, f.ram)
+		self.assertEqual(result.href, f.href)
+
+	def test_delete_instance(self):
+		result = self.driver.delete_instance('68345c52')
+		self.assertEqual(result, [])
+
 	def test_list_instances(self):
 		result = list(self.driver.list_instances())
 		self.assertEqual(len(result), 2)
@@ -85,34 +109,11 @@ class RackspaceTests(unittest.TestCase):
 		self.assertEqual(result.name, i.name)
 		self.assertEqual(result.status, i.status)
 		self.assertEqual(result.id, i.id)
-		self.assertTrue(result.rootEnabled == i.rootEnabled)
+		self.assertEqual(result.rootEnabled, i.rootEnabled)
 		self.assertEqual(str(result.databases[0]),
 				str(i.databases[0]))
 		self.assertEqual(str(result.databases[1]),
 				str(i.databases[1]))
-
-	def test_list_flavors(self):
-		results = self.driver.list_flavors()
-		self.assertEqual(len(results), 4)
-		self.assertEqual(results[0].id, 3)
-		self.assertEqual(results[0].ram, 2048)
-		self.assertEqual(results[0].href,
-			"http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/3")
-
-	def test_get_instance(self):
-		href = ("http://ord.databases.api." +
-			"rackspacecloud.com/v1.0/586067/flavors/3")
-		f = Flavor(3, 'm1.medium', 1, 2048, href)
-		result = self.driver.get_flavor(3)
-		self.assertEqual(result.id, f.id)
-		self.assertEqual(result.name, f.name)
-		self.assertEqual(result.vcpus, f.vcpus)
-		self.assertEqual(result.ram, f.ram)
-		self.assertEqual(result.href, f.href)
-
-	def test_delete_instance(self):
-		result = self.driver.delete_instance('68345c52')
-		self.assertEqual(result, [])
 
 	def test_create_instance_with_databases(self):
 		flavorRef = "http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/1"

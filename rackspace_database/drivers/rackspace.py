@@ -262,12 +262,15 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 	def _to_instance(self, obj, value_dict):
 		status = InstanceStatus.__dict__[obj['status']]
 		flavorRef = self.__extract_flavor_ref(obj['flavor'])
+		rootEnabled = obj.get('rootEnabled')
 		if obj.get('databases'):
 			databases = [self._to_database(d, value_dict) for d
 				in obj.get('databases', [])]
 		else:
 			databases = None
-		return Instance(flavorRef, obj['volume']['size'], id=obj['id'], name=obj['name'], status=status, databases=databases)
+		return Instance(flavorRef, obj['volume']['size'], id=obj['id'],
+				name=obj['name'], status=status, rootEnabled=rootEnabled,
+				databases=databases)
 
 	def _from_instance(self, instance):
 		d = {
@@ -281,6 +284,8 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 		if instance.databases:
 			d['databases'] = [self._from_database(x)
 					for x in instance.databases]
+		if instance.rootEnabled:
+			d['rootEnabled'] = instance.rootEnabled
 		return d
 
 	def _to_flavor(self, obj, value_dict):
