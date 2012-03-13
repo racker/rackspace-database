@@ -178,6 +178,10 @@ class RackspaceTests(unittest.TestCase):
 				User('testuser'), User('userwith2dbs')]
 		self.assertEqual(str(results), str(expected))
 
+	def test_delete_user(self):
+		result = self.driver.delete_user('123456', 'auser')
+		self.assertEqual(result, [])
+
 
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -311,6 +315,14 @@ class RackspaceMockHttp(MockHttpTestCase):
 					httplib.responses[httplib.NO_CONTENT])
 
 		raise NotImplementedError('')
+
+	def _586067_instances_123456_users_auser(self, method, url, body, headers):
+		if method == 'DELETE':
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
+
+		raise NotImplementedError('')
+
 
 	def _586067_flavors_detail(self, method, url, body, headers):
 		if method == 'GET':

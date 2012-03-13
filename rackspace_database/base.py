@@ -139,5 +139,8 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'list_users not implemented for this driver')
 
+	def delete_user(self, instance_id, user_name):
+		raise NotImplementedError(
+			'delete_user not implemented for this driver')
 
 
