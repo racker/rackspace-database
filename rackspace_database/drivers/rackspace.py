@@ -208,9 +208,15 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 		data = value_dict.get('data', {})
 		url = value_dict.get('url')
 
+		# TODO: this is so obviously a flaw in the API, returning a message
+		# that says 'The request is accepted for processing.' along
+		# with a 202 status is redundant and makes me have to do hacks like this
+		expects_response = value_dict.get('list_item_mapper') or\
+				value_dict.get('object_mapper')
+
 		response = self.connection.request(url, method=method, data=data, params=params)
 
-		if response.status == httplib.NO_CONTENT:
+		if response.status == httplib.NO_CONTENT or not expects_response:
 			return []
 		elif response.status == httplib.OK:
 			resp = json.loads(response.body)
