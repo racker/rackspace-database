@@ -127,5 +127,10 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'delete_database not implemented for this driver')
 
+	def create_users(self, instance_id, user_databases_pairs):
+		raise NotImplementedError(
+			'create_users not implemented for this driver')
+
+
 
 

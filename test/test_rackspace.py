@@ -151,6 +151,20 @@ class RackspaceTests(unittest.TestCase):
 		result = self.driver.delete_database('123456', 'adatabase')
 		self.assertEqual(result, [])
 
+	def test_create_users(self):
+		users = [User('a_user', password='a_password'),
+				User('another_user', password='another_password')]
+		database_lists = [[Database('a_database'), Database('another_database')],
+				[Database('yet_another_database')]]
+
+		result = self.driver.create_users('123456',
+				[
+					(users[0], database_lists[0]),
+					(users[1], database_lists[1])
+				])
+
+		self.assertEqual(result, [])
+
 
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -237,6 +251,27 @@ class RackspaceMockHttp(MockHttpTestCase):
 
 	def _586067_instances_123456_databases_adatabase(self, method, url, body, headers):
 		if method == 'DELETE':
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
+
+		raise NotImplementedError('')
+
+	def _586067_instances_123456_users(self, method, url, body, headers):
+		if method == 'POST':
+			data = { 'users' : [
+				{	'databases' : [
+						{'name' : 'a_database'},
+						{'name' : 'another_database'}
+					],
+					'name' : 'a_user',
+					'password' : 'a_password'
+				},
+				{	'databases' : [ {'name' : 'yet_another_database'} ],
+					'name' : 'another_user',
+					'password' : 'another_password'
+				}
+			]}
+			self.assertEqual(json.loads(body), data)
 			return (httplib.NO_CONTENT, body, self.json_content_headers,
 					httplib.responses[httplib.NO_CONTENT])
 
