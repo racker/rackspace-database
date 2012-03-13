@@ -362,6 +362,25 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 		return self._delete_request(value_dict)
 
 
+	def create_users(self, instance_id, user_databases_pairs):
+		def _from_user_databases_pair((user, databases)):
+			data = {
+				'databases' : [self._from_database(d) for d in databases],
+				'name' : user.name
+			}
+			if user.password:
+				data['password'] = user.password
+			return data
+
+		data = { 'users' :
+			[_from_user_databases_pair(p) for p in user_databases_pairs]
+		}
+
+		value_dict = {'url' : '/instances/%s/users' % instance_id,
+				'data' : data }
+
+		return self._post_request(value_dict)
+
 	def list_flavors(self):
 		value_dict = {'url' : '/flavors/detail',
 				'namespace' : 'flavors',
