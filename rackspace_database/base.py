@@ -147,4 +147,7 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'delete_user not implemented for this driver')
 
+	def enable_root(self, instance_id):
+		raise NotImplementedError(
+			'enable_root not implemented for this driver')
 

@@ -188,6 +188,11 @@ class RackspaceTests(unittest.TestCase):
 		result = self.driver.delete_user('123456', 'auser')
 		self.assertEqual(result, [])
 
+	def test_enable_root(self):
+		expected = User('root', password='12345-678910')
+		result = self.driver.enable_root('123456')
+		self.assertEqual(str(result), str(expected))
+
 
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -358,6 +363,12 @@ class RackspaceMockHttp(MockHttpTestCase):
 					httplib.responses[httplib.OK])
 		raise NotImplementedError('')
 
+	def _586067_instances_123456_root(self, method, url, body, headers):
+		if method == 'POST':
+			body = self.fixtures.load('enable_root.json')
+			return (httplib.OK, body, self.json_content_headers,
+					httplib.responses[httplib.OK])
+		raise NotImplementedError('')
 
 
 
