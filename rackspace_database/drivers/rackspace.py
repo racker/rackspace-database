@@ -381,6 +381,9 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 
 		return self._post_request(value_dict)
 
+	def create_user(self, instance_id, user, databases):
+		return self.create_users(instance_id, [(user, databases)])
+
 	def list_flavors(self):
 		value_dict = {'url' : '/flavors/detail',
 				'namespace' : 'flavors',
