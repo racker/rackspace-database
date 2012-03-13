@@ -165,6 +165,13 @@ class RackspaceTests(unittest.TestCase):
 
 		self.assertEqual(result, [])
 
+	def test_create_user(self):
+		user = User('a_user', password='a_password')
+		database_list = [Database('a_database'), Database('another_database')]
+
+		result = self.driver.create_user('1234567', user, database_list)
+		self.assertEqual(result, [])
+
 
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -277,7 +284,22 @@ class RackspaceMockHttp(MockHttpTestCase):
 
 		raise NotImplementedError('')
 
+	def _586067_instances_1234567_users(self, method, url, body, headers):
+		if method == 'POST':
+			data = { 'users' : [
+				{	'databases' : [
+						{'name' : 'a_database'},
+						{'name' : 'another_database'}
+					],
+					'name' : 'a_user',
+					'password' : 'a_password'
+				}
+			]}
+			self.assertEqual(json.loads(body), data)
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
 
+		raise NotImplementedError('')
 
 	def _586067_flavors_detail(self, method, url, body, headers):
 		if method == 'GET':
