@@ -411,4 +411,11 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 		return self._get_request(value_dict)
 
 
+	def enable_root(self, instance_id):
+		value_dict = {'url' : '/instances/%s/root' % instance_id,
+				'namespace' : 'user',
+				'object_mapper' : self._to_user}
+		return self._post_request(value_dict)
+
+
 
