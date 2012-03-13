@@ -117,6 +117,10 @@ class DatabaseDriver(object):
 
 	def create_databases(self, instance_id, databases):
 		raise NotImplementedError(
+			'create_databases not implemented for this driver')
+
+	def create_database(self, instance_id, database):
+		raise NotImplementedError(
 			'create_database not implemented for this driver')
 
 	def list_databases(self, instance_id):

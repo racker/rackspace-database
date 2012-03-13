@@ -138,6 +138,12 @@ class RackspaceTests(unittest.TestCase):
 		result = self.driver.create_databases('123456', databases)
 		self.assertEqual(result, [])
 
+	def test_create_database(self):
+		database = Database('a_database', character_set='cset',
+				collate='cset_general_ci')
+		result = self.driver.create_database('1234567', database)
+		self.assertEqual(result, [])
+
 	def test_list_databases(self):
 		databases = [Database('a_database', character_set='utf8',
 				collate='utf8_general_ci'),
@@ -264,6 +270,20 @@ class RackspaceMockHttp(MockHttpTestCase):
 			body = self.fixtures.load('list_databases.json')
 			return (httplib.OK, body, self.json_content_headers,
 				httplib.responses[httplib.OK])
+		raise NotImplementedError('')
+
+	def _586067_instances_1234567_databases(self, method, url, body, headers):
+		if method == 'POST':
+			data = { 'databases' : [
+					{	'character_set' : 'cset',
+						'collate' : 'cset_general_ci',
+						'name' : 'a_database'
+					},
+				] }
+			self.assertEqual(json.loads(body), data)
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
+
 		raise NotImplementedError('')
 
 	def _586067_instances_123456_databases_adatabase(self, method, url, body, headers):
