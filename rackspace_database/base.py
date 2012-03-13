@@ -135,5 +135,9 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'create_user not implemented for this driver')
 
+	def list_users(self, instance_id):
+		raise NotImplementedError(
+			'list_users not implemented for this driver')
+
 
 

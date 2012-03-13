@@ -172,6 +172,12 @@ class RackspaceTests(unittest.TestCase):
 		result = self.driver.create_user('1234567', user, database_list)
 		self.assertEqual(result, [])
 
+	def test_list_users(self):
+		results = self.driver.list_users('123456')
+		expected = [User('dbuser3'), User('dbuser4'),
+				User('testuser'), User('userwith2dbs')]
+		self.assertEqual(str(results), str(expected))
+
 
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -281,6 +287,11 @@ class RackspaceMockHttp(MockHttpTestCase):
 			self.assertEqual(json.loads(body), data)
 			return (httplib.NO_CONTENT, body, self.json_content_headers,
 					httplib.responses[httplib.NO_CONTENT])
+		elif method == 'GET':
+			body = self.fixtures.load('list_users.json')
+			return (httplib.OK, body, self.json_content_headers,
+				httplib.responses[httplib.OK])
+
 
 		raise NotImplementedError('')
 

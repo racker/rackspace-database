@@ -1,0 +1,16 @@
+{
+    "users": [
+        {
+            "name": "dbuser3"
+        }, 
+        {
+            "name": "dbuser4"
+        }, 
+        {
+            "name": "testuser"
+        }, 
+        {
+            "name": "userwith2dbs"
+        }
+    ]
+}
