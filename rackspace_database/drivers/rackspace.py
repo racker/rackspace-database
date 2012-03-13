@@ -384,6 +384,11 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 	def create_user(self, instance_id, user, databases):
 		return self.create_users(instance_id, [(user, databases)])
 
+	def delete_user(self, instance_id, user_name):
+		value_dict = {'url' : '/instances/%s/users/%s/' %
+				(instance_id, user_name)}
+		return self._delete_request(value_dict)
+
 	def list_users(self, instance_id):
 		value_dict = {'url' : '/instances/%s/users' % instance_id,
 				'namespace' : 'users',
