@@ -151,3 +151,7 @@ class DatabaseDriver(object):
 		raise NotImplementedError(
 			'enable_root not implemented for this driver')
 
+	def has_root_enabled(self, instance_id):
+		raise NotImplementedError(
+			'has_root_enabled not implemented for this driver')
+

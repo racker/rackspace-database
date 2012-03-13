@@ -193,6 +193,12 @@ class RackspaceTests(unittest.TestCase):
 		result = self.driver.enable_root('123456')
 		self.assertEqual(str(result), str(expected))
 
+	def test_has_root_enabled(self):
+		result = self.driver.has_root_enabled('123456')
+		self.assertEqual(result, True)
+		result = self.driver.has_root_enabled('1234567')
+		self.assertEqual(result, False)
+
 
 class RackspaceMockHttp(MockHttpTestCase):
 	auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -368,8 +374,18 @@ class RackspaceMockHttp(MockHttpTestCase):
 			body = self.fixtures.load('enable_root.json')
 			return (httplib.OK, body, self.json_content_headers,
 					httplib.responses[httplib.OK])
+		elif method == 'GET':
+			body = self.fixtures.load('has_root_enabled_true.json')
+			return (httplib.OK, body, self.json_content_headers,
+					httplib.responses[httplib.OK])
 		raise NotImplementedError('')
 
+	def _586067_instances_1234567_root(self, method, url, body, headers):
+		if method == 'GET':
+			body = self.fixtures.load('has_root_enabled_false.json')
+			return (httplib.OK, body, self.json_content_headers,
+					httplib.responses[httplib.OK])
+		raise NotImplementedError('')
 
 
 if __name__ == '__main__':
