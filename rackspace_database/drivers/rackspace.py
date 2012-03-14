@@ -342,11 +342,18 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 				'data' : data}
 		return self._post_request(value_dict)
 
-	def resize_instance(self, instance_id, size):
+	def resize_instance_volume(self, instance_id, size):
 		data = {'resize' : { 'volume' : { 'size' : size } } }
 		value_dict = {'url' : '/instances/%s/action' % instance_id,
 				'data' : data}
 		return self._post_request(value_dict)
+
+	def resize_instance(self, instance_id, flavorRef):
+		data = {'resize' : {'flavorRef' : flavorRef}}
+		value_dict = {'url' : '/instances/%s/action' % instance_id,
+				'data' : data}
+		return self._post_request(value_dict)
+
 
 
 	def create_databases(self, instance_id, databases):
