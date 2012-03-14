@@ -127,8 +127,13 @@ class RackspaceTests(unittest.TestCase):
 		result = self.driver.restart_instance('123456')
 		self.assertEqual(result, [])
 
+	def test_resize_instance_volume(self):
+		result = self.driver.resize_instance_volume('1234567', 4)
+		self.assertEqual(result, [])
+
 	def test_resize_instance(self):
-		result = self.driver.resize_instance('1234567', 4)
+		flavorRef = "http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/1"
+		result = self.driver.resize_instance('12345678', flavorRef)
 		self.assertEqual(result, [])
 
 	def test_create_databases(self):
@@ -259,6 +264,15 @@ class RackspaceMockHttp(MockHttpTestCase):
 	def _586067_instances_1234567_action(self, method, url, body, headers):
 		if method == 'POST':
 			self.assertEqual(json.loads(body), {'resize':{'volume':{'size':4}}})
+			return (httplib.NO_CONTENT, body, self.json_content_headers,
+					httplib.responses[httplib.NO_CONTENT])
+
+		raise NotImplementedError('')
+
+	def _586067_instances_12345678_action(self, method, url, body, headers):
+		if method == 'POST':
+			flavorRef = "http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/1"
+			self.assertEqual(json.loads(body), {'resize':{'flavorRef': flavorRef}})
 			return (httplib.NO_CONTENT, body, self.json_content_headers,
 					httplib.responses[httplib.NO_CONTENT])
 
