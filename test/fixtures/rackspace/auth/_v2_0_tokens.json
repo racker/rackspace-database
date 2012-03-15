@@ -1,21 +1,27 @@
 {
     "access": {
         "token": {
-            "id": "1111-1111-1111-111",
-            "expires": "2011-12-12T21:01:03.000-06:00"
+            "id": "256249cc-d840-42fa-b892-967fbfab242a",
+            "expires": "2012-03-16T09:50:35.000-05:00"
         },
         "serviceCatalog": [
             {
                 "endpoints": [
                     {
+                        "region": "DFW",
+                        "tenantId": "586067",
+                        "publicURL": "https://preprod.dfw.servers.api.rackspacecloud.com/v2/586067"
+                    }
+                ],
+                "name": "cloudServersPreprod",
+                "type": "compute"
+            },
+            {
+                "endpoints": [
+                    {
                         "region": "ORD",
-                        "tenantId": "MossoCloudFS_1111-11111-1111-111",
-                        "publicURL": "https://cdn2.clouddrive.com/v1/MossoCloudFS_1111-11111-1111-111",
-                        "version": {
-                            "versionInfo": "https://cdn2.clouddrive.com/v1/",
-                            "versionList": "https://cdn2.clouddrive.com/",
-                            "versionId": "1"
-                        }
+                        "tenantId": "MossoCloudFS_82c36485-9599-41f8-9a34-a2bacf967c3b",
+                        "publicURL": "https://cdn2.clouddrive.com/v1/MossoCloudFS_82c36485-9599-41f8-9a34-a2bacf967c3b"
                     }
                 ],
                 "name": "cloudFilesCDN",
@@ -24,33 +30,31 @@
             {
                 "endpoints": [
                     {
-                        "region": "ORD",
-                        "tenantId": "MossoCloudFS_1111-11111-1111-111",
-                        "publicURL": "https://storage101.ord1.clouddrive.com/v1/MossoCloudFS_1111-11111-1111-111",
-                        "internalURL": "https://snet-storage101.ord1.clouddrive.com/v1/MossoCloudFS_1111-11111-1111-111"
-                    }
-                ],
-                "name": "cloudFiles",
-                "type": "object-store"
-            },
-            {
-                "endpoints": [
-                    {
                         "tenantId": "586067",
                         "publicURL": "https://servers.api.rackspacecloud.com/v1.0/586067",
-                        "version": {
-                            "versionInfo": "https://servers.api.rackspacecloud.com/v1.0/",
-                            "versionList": "https://servers.api.rackspacecloud.com/",
-                            "versionId": "1.0"
-                        }
+                        "versionInfo": "https://servers.api.rackspacecloud.com/v1.0/",
+                        "versionList": "https://servers.api.rackspacecloud.com/",
+                        "versionId": "1.0"
                     }
                 ],
                 "name": "cloudServers",
                 "type": "compute"
+            },
+            {
+                "endpoints": [
+                    {
+                        "region": "ORD",
+                        "tenantId": "MossoCloudFS_82c36485-9599-41f8-9a34-a2bacf967c3b",
+                        "publicURL": "https://storage101.ord1.clouddrive.com/v1/MossoCloudFS_82c36485-9599-41f8-9a34-a2bacf967c3b",
+                        "internalURL": "https://snet-storage101.ord1.clouddrive.com/v1/MossoCloudFS_82c36485-9599-41f8-9a34-a2bacf967c3b"
+                    }
+                ],
+                "name": "cloudFiles",
+                "type": "object-store"
             }
         ],
         "user": {
-            "id": "84268",
+            "id": "114113",
             "roles": [
                 {
                     "id": "identity:default",
@@ -58,7 +62,7 @@
                     "name": "identity:default"
                 }
             ],
-            "name": "kamislo"
+            "name": "reachdevsf"
         }
     }
 }

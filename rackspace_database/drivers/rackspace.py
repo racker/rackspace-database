@@ -115,7 +115,7 @@ class RackspaceDatabaseConnection(OpenStackBaseConnection):
     def __init__(self, user_id, key, secure=False, ex_force_base_url=API_URL,
                  ex_force_auth_url=None, ex_force_auth_version='2.0'):
         self.api_version = API_VERSION
-        self.monitoring_url = ex_force_base_url
+        self.database_url = ex_force_base_url
         self.accept_format = 'application/json'
         super(RackspaceDatabaseConnection, self).__init__(user_id, key,
                                 secure=secure,
@@ -159,9 +159,12 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         super(RackspaceDatabaseDriver, self).__init__(*args, **kwargs)
 
         self.connection._populate_hosts_and_request_paths()
-        tenant_id = self.connection.tenant_ids['compute']
-        self.connection._force_base_url = '%s/%s' % (
-                self.connection._force_base_url, tenant_id)
+        tenant_id = self.connection.service_catalog.get_endpoint(
+                service_type='compute', name='cloudServers')['tenantId']
+
+        url = '%s/%s' % (API_URL, tenant_id)
+        (self.connection.host, self.connection.port, self.connection.secure,
+            self.connection.request_path) = self.connection._tuple_from_url(url)
 
     def _ex_connection_class_kwargs(self):
         rv = {}
