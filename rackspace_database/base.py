@@ -21,8 +21,8 @@ class Instance(object):
 
     def __repr__(self):
         return (("<Instance: id=%s, name=%s, status=%d," +
-                "size=%d, flavorRef=%s, databases=%s, rootEnabled=%s >") %
-                (self.id, self.name, self.status, self.size,
+                "size=%s, flavorRef=%s, databases=%s, rootEnabled=%s >") %
+                (self.id, self.name, self.status, str(self.size),
                     self.flavorRef, self.databases, str(self.rootEnabled)))
 
 
