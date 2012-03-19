@@ -46,7 +46,7 @@ class Flavor(object):
         self.href = href
 
     def __repr__(self):
-        return ("<Flavor: id=%d, name=%s, vcpus=%d, ram=%d, link=%s >"
+        return ("<Flavor: id=%d, name=%s, vcpus=%d, ram=%d, href=%s >"
             % (self.id, self.name, self.vcpus, self.ram, self.href))
 
 
