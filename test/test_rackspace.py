@@ -256,7 +256,8 @@ class RackspaceMockHttp(MockHttpTestCase):
 
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_123456_action(self, method, url, body, headers):
+    def _v1_0_586067_instances_123456_action(\
+            self, method, url, body, headers):
         if method == 'POST':
             self.assertEqual(json.loads(body), {'restart': {}})
             return (httplib.NO_CONTENT, body, self.json_content_headers,
@@ -264,7 +265,8 @@ class RackspaceMockHttp(MockHttpTestCase):
 
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_1234567_action(self, method, url, body, headers):
+    def _v1_0_586067_instances_1234567_action(\
+            self, method, url, body, headers):
         if method == 'POST':
             data = {'resize': {'volume': {'size': 4}}}
             self.assertEqual(json.loads(body), data)
@@ -273,7 +275,8 @@ class RackspaceMockHttp(MockHttpTestCase):
 
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_12345678_action(self, method, url, body, headers):
+    def _v1_0_586067_instances_12345678_action(\
+            self, method, url, body, headers):
         if method == 'POST':
             flavorRef = ("http://ord.databases.api.rackspacecloud.com" +
             "/v1.0/586067/flavors/1")
@@ -284,7 +287,8 @@ class RackspaceMockHttp(MockHttpTestCase):
 
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_123456_databases(self, method, url, body, headers):
+    def _v1_0_586067_instances_123456_databases(\
+            self, method, url, body, headers):
         if method == 'POST':
             data = {'databases': [
                     {'character_set': 'utf8',
@@ -302,7 +306,8 @@ class RackspaceMockHttp(MockHttpTestCase):
                 httplib.responses[httplib.OK])
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_1234567_databases(self, method, url, body, headers):
+    def _v1_0_586067_instances_1234567_databases(\
+            self, method, url, body, headers):
         if method == 'POST':
             data = {'databases': [
                     {'character_set': 'cset',
@@ -324,7 +329,8 @@ class RackspaceMockHttp(MockHttpTestCase):
 
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_123456_users(self, method, url, body, headers):
+    def _v1_0_586067_instances_123456_users(\
+            self, method, url, body, headers):
         if method == 'POST':
             data = {'users': [
                 {'databases': [
@@ -349,7 +355,8 @@ class RackspaceMockHttp(MockHttpTestCase):
 
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_1234567_users(self, method, url, body, headers):
+    def _v1_0_586067_instances_1234567_users(\
+            self, method, url, body, headers):
         if method == 'POST':
             data = {'users': [
                 {'databases': [
@@ -366,28 +373,32 @@ class RackspaceMockHttp(MockHttpTestCase):
 
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_123456_users_auser(self, method, url, body, headers):
+    def _v1_0_586067_instances_123456_users_auser(\
+            self, method, url, body, headers):
         if method == 'DELETE':
             return (httplib.NO_CONTENT, body, self.json_content_headers,
                     httplib.responses[httplib.NO_CONTENT])
 
         raise NotImplementedError('')
 
-    def _v1_0_586067_flavors_detail(self, method, url, body, headers):
+    def _v1_0_586067_flavors_detail(\
+            self, method, url, body, headers):
         if method == 'GET':
             body = self.fixtures.load('list_flavors.json')
             return (httplib.OK, body, self.json_content_headers,
                     httplib.responses[httplib.OK])
         raise NotImplementedError('')
 
-    def _v1_0_586067_flavors_3(self, method, url, body, headers):
+    def _v1_0_586067_flavors_3(\
+            self, method, url, body, headers):
         if method == 'GET':
             body = self.fixtures.load('get_flavor.json')
             return (httplib.OK, body, self.json_content_headers,
                     httplib.responses[httplib.OK])
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_123456_root(self, method, url, body, headers):
+    def _v1_0_586067_instances_123456_root(\
+            self, method, url, body, headers):
         if method == 'POST':
             body = self.fixtures.load('enable_root.json')
             return (httplib.OK, body, self.json_content_headers,
@@ -398,7 +409,8 @@ class RackspaceMockHttp(MockHttpTestCase):
                     httplib.responses[httplib.OK])
         raise NotImplementedError('')
 
-    def _v1_0_586067_instances_1234567_root(self, method, url, body, headers):
+    def _v1_0_586067_instances_1234567_root(\
+            self, method, url, body, headers):
         if method == 'GET':
             body = self.fixtures.load('has_root_enabled_false.json')
             return (httplib.OK, body, self.json_content_headers,

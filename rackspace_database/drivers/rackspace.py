@@ -163,8 +163,9 @@ class RackspaceDatabaseDriver(DatabaseDriver):
                 service_type='compute', name='cloudServers')['tenantId']
 
         url = '%s/%s' % (API_URL, tenant_id)
-        (self.connection.host, self.connection.port, self.connection.secure,
-            self.connection.request_path) = self.connection._tuple_from_url(url)
+        conn = self.connection
+        (conn.host, conn.port, conn.secure,
+            conn.request_path) = conn._tuple_from_url(url)
 
     def _ex_connection_class_kwargs(self):
         rv = {}
