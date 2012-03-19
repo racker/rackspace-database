@@ -282,7 +282,13 @@ class RackspaceDatabaseDriver(DatabaseDriver):
                 in obj.get('databases', [])]
         else:
             databases = None
-        return Instance(flavorRef, obj['volume']['size'], id=obj['id'],
+
+        if obj.get('volume') and obj['volume'].get('size'):
+            size = obj['volume']['size']
+        else:
+            size = None
+
+        return Instance(flavorRef, size=size, id=obj['id'],
                 name=obj['name'], status=status, rootEnabled=rootEnabled,
                 databases=databases)
 

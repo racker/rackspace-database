@@ -10,11 +10,11 @@ class InstanceStatus(object):
 
 
 class Instance(object):
-    def __init__(self, flavorRef, size, **kwargs):
+    def __init__(self, flavorRef, **kwargs):
         self.id = kwargs.get('id')
         self.name = kwargs.get('name')
         self.status = kwargs.get('status')
-        self.size = size
+        self.size = kwargs.get('size')
         self.flavorRef = flavorRef
         self.databases = kwargs.get('databases')
         self.rootEnabled = kwargs.get('rootEnabled')

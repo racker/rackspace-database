@@ -83,13 +83,16 @@ class RackspaceTests(unittest.TestCase):
 
     def test_list_instances(self):
         result = list(self.driver.list_instances())
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[0].id, '68345c52')
-        self.assertEqual(result[0].databases, None)
-        self.assertEqual(result[0].rootEnabled, None)
-        self.assertEqual(result[1].id, '12345c52')
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0].id, '81e93520')
+        self.assertEqual(result[0].size, None)
+        self.assertEqual(result[1].id, '68345c52')
         self.assertEqual(result[1].databases, None)
         self.assertEqual(result[1].rootEnabled, None)
+        self.assertEqual(result[1].size, 2)
+        self.assertEqual(result[2].id, '12345c52')
+        self.assertEqual(result[2].databases, None)
+        self.assertEqual(result[2].rootEnabled, None)
 
     def test_get_instance(self):
         flavorRef = ("http://ord.databases.api." +
@@ -100,7 +103,7 @@ class RackspaceTests(unittest.TestCase):
                 Database(name='sampledb', collate='utf8_general_ci',
                     character_set='utf8')
         ]
-        i = Instance(flavorRef, 2, name='a_rack_instance',
+        i = Instance(flavorRef, size=2, name='a_rack_instance',
                 id='68345c52', databases=databases,
                 status=InstanceStatus.ACTIVE, rootEnabled=False)
         result = self.driver.get_instance('68345c52')
@@ -120,7 +123,8 @@ class RackspaceTests(unittest.TestCase):
         "/v1.0/586067/flavors/1")
         databases = [Database('some_database'),
                 Database('another_database', character_set='utf8')]
-        i = Instance(flavorRef, 2, name='a_rack_instance', databases=databases)
+        i = Instance(flavorRef, size=2,
+                name='a_rack_instance', databases=databases)
         result = self.driver.create_instance(i)
         self.assertEqual(result.name, 'a_rack_instance')
 
