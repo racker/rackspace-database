@@ -106,7 +106,7 @@ class RackspaceTests(unittest.TestCase):
         i = Instance(flavorRef, size=2, name='a_rack_instance',
                 id='68345c52', databases=databases,
                 status=InstanceStatus.ACTIVE, rootEnabled=False)
-        result = self.driver.get_instance('68345c52')
+        result = self.driver.get_instance(i)
 
         self.assertEqual(result.flavorRef, i.flavorRef)
         self.assertEqual(result.name, i.name)

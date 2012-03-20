@@ -322,6 +322,30 @@ class RackspaceDatabaseDriver(DatabaseDriver):
             d['password'] = user.password
         return d
 
+    def _resolve_instance_id(self, instance_id):
+        if type(instance_id) == str:
+           return instance_id
+        elif type(instance_id) == Instance:
+            return instance_id.id
+
+    def _resolve_database_name(self, database_name):
+        if type(database_name) == str:
+            return database_name
+        else:
+            return database_name.name
+
+    def _resolve_flavor_ref(self, flavorRef):
+        if type(flavorRef) == str:
+            return flavorRef
+        else:
+            return flavorRef.href
+
+    def _resolve_user_name(self, user_name):
+        if type(user_name) == str:
+            return user_name
+        elif type(user_name) == User:
+            return user_name.name
+
     def list_instances(self):
         value_dict = {'url': '/instances/detail',
                 'namespace': 'instances',
@@ -329,6 +353,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         return self._get_request(value_dict)
 
     def get_instance(self, instance_id):
+        instance_id = self._resolve_instance_id(instance_id)
         value_dict = {'url': '/instances/%s' % instance_id,
                 'namespace': 'instance',
                 'object_mapper': self._to_instance}
@@ -344,28 +369,34 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         return self._post_request(value_dict)
 
     def delete_instance(self, instance_id):
+        instance_id = self._resolve_instance_id(instance_id)
         value_dict = {'url': '/instances/%s' % instance_id}
         return self._delete_request(value_dict)
 
     def restart_instance(self, instance_id):
+        instance_id = self._resolve_instance_id(instance_id)
         data = {'restart': {}}
         value_dict = {'url': '/instances/%s/action' % instance_id,
                 'data': data}
         return self._post_request(value_dict)
 
     def resize_instance_volume(self, instance_id, size):
+        instance_id = self._resolve_instance_id(instance_id)
         data = {'resize': {'volume': {'size': size}}}
         value_dict = {'url': '/instances/%s/action' % instance_id,
                 'data': data}
         return self._post_request(value_dict)
 
     def resize_instance(self, instance_id, flavorRef):
+        instance_id = self._resolve_instance_id(instance_id)
+        flavorRef = self._resolve_flavor_ref(flavorRef)
         data = {'resize': {'flavorRef': flavorRef}}
         value_dict = {'url': '/instances/%s/action' % instance_id,
                 'data': data}
         return self._post_request(value_dict)
 
     def create_databases(self, instance_id, databases):
+        instance_id = self._resolve_instance_id(instance_id)
         data = {'databases':
                 [self._from_database(x) for x in databases]}
         value_dict = {'url': '/instances/%s/databases' % instance_id,
@@ -373,20 +404,25 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         return self._post_request(value_dict)
 
     def create_database(self, instance_id, database):
+        instance_id = self._resolve_instance_id(instance_id)
         return self.create_databases(instance_id, [database])
 
     def list_databases(self, instance_id):
+        instance_id = self._resolve_instance_id(instance_id)
         value_dict = {'url': '/instances/%s/databases' % instance_id,
                 'namespace': 'databases',
                 'list_item_mapper': self._to_database}
         return self._get_request(value_dict)
 
     def delete_database(self, instance_id, database_name):
+        instance_id = self._resolve_instance_id(instance_id)
+        database_name = self._resolve_database_name(database_name)
         value_dict = {'url': '/instances/%s/databases/%s' %
                 (instance_id, database_name)}
         return self._delete_request(value_dict)
 
     def create_users(self, instance_id, user_databases_pairs):
+        instance_id = self._resolve_instance_id(instance_id)
         def _from_user_databases_pair((user, databases)):
             data = {
                 'databases': [self._from_database(d) for d in databases],
@@ -406,14 +442,18 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         return self._post_request(value_dict)
 
     def create_user(self, instance_id, user, databases):
+        instance_id = self._resolve_instance_id(instance_id)
         return self.create_users(instance_id, [(user, databases)])
 
     def delete_user(self, instance_id, user_name):
+        instance_id = self._resolve_instance_id(instance_id)
+        user_name = self._resolve_user_name(user_name)
         value_dict = {'url': '/instances/%s/users/%s/' %
                 (instance_id, user_name)}
         return self._delete_request(value_dict)
 
     def list_users(self, instance_id):
+        instance_id = self._resolve_instance_id(instance_id)
         value_dict = {'url': '/instances/%s/users' % instance_id,
                 'namespace': 'users',
                 'list_item_mapper': self._to_user}
@@ -432,12 +472,14 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         return self._get_request(value_dict)
 
     def enable_root(self, instance_id):
+        instance_id = self._resolve_instance_id(instance_id)
         value_dict = {'url': '/instances/%s/root' % instance_id,
                 'namespace': 'user',
                 'object_mapper': self._to_user}
         return self._post_request(value_dict)
 
     def has_root_enabled(self, instance_id):
+        instance_id = self._resolve_instance_id(instance_id)
         def id(x, value_dict):
             return x
         value_dict = {'url': '/instances/%s/root' % instance_id,
