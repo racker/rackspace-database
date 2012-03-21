@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import sys
+import time
 
 try:
     import simplejson as json
@@ -167,6 +168,9 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         (conn.host, conn.port, conn.secure,
             conn.request_path) = conn._tuple_from_url(url)
 
+        self.poll_interval = 2
+        self.timeout = 80
+
     def _ex_connection_class_kwargs(self):
         rv = {}
         if self._ex_force_base_url:
@@ -253,6 +257,23 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 
     def _delete_request(self, value_dict):
         return self._request(value_dict, 'DELETE')
+
+    def _block_until_ready(self, instance_id):
+        total_time = 0
+
+        def helper():
+            i = self.get_instance(instance_id)
+            if i.status == InstanceStatus.FAILED:
+                raise LibcloudError("Load balancer entered an ERROR state.",
+                                                        driver=self.driver)
+            return i.status == InstanceStatus.ACTIVE
+
+        while not helper():
+            total_time += self.poll_interval
+            if total_time >= self.timeout:
+                raise LibcloudError('Job did not complete in %s seconds' %
+                                                        (self.timeout))
+            time.sleep(self.poll_interval)
 
     def __extract_flavor_ref(self, obj):
         for link in obj['links']:
@@ -360,6 +381,18 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         return self._get_request(value_dict)
 
     def create_instance(self, instance):
+        data = self._from_instance(instance)
+
+        value_dict = {'url': '/instances',
+                'namespace': 'instance',
+                'data': {'instance': data},
+                'object_mapper': self._to_instance}
+        instance_id = self._post_request(value_dict).id
+        self._block_until_ready(instance_id)
+        return self.get_instance(instance_id)
+
+
+    def create_instance_no_poll(self, instance):
         data = self._from_instance(instance)
 
         value_dict = {'url': '/instances',
