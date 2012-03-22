@@ -422,5 +422,30 @@ class RackspaceMockHttp(MockHttpTestCase):
         raise NotImplementedError('')
 
 
+class RackspaceIntegrationTests(unittest.TestCase):
+
+    def __init__(self, u):
+        self.driver = RackspaceDatabaseDriver(key=RACKSPACE_PARAMS[0],
+                        secret=RACKSPACE_PARAMS[1])
+
+        super(RackspaceIntegrationTests, self).__init__(u)
+
+        for i in self.driver.list_instances():
+            self.driver.delete_instance(i)
+
+    def test_create_instance(self):
+        min_flavor = self.driver.get_flavor(1)
+        instance = Instance(name='an_instance', flavorRef=min_flavor,
+                size=2)
+        self.driver.create_instance(instance)
+        results = self.driver.list_instances()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].name, instance.name)
+        self.assertEqual(results[0].size, instance.size)
+        self.assertEqual(results[0].flavorRef, instance.flavorRef.href)
+
+
+
+
 if __name__ == '__main__':
     sys.exit(unittest.main(verbosity=5))
