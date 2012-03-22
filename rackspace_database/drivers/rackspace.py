@@ -510,7 +510,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
     def delete_user(self, instance_id, user_name):
         instance_id = self._resolve_instance_id(instance_id)
         user_name = self._resolve_user_name(user_name)
-        value_dict = {'url': '/instances/%s/users/%s/' %
+        value_dict = {'url': '/instances/%s/users/%s' %
                 (instance_id, user_name)}
         return self._delete_request(value_dict)
 
