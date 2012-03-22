@@ -205,7 +205,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
                      raise Exception(e)
         self.connection._block_until_ready(instance_id, has_completed)
 
-    def block_until_create_instance_ready(self, instance_id):
+    def block_until_instance_ready(self, instance_id):
         def has_completed(i_id):
             i = self.get_instance(i_id)
             if i.status == InstanceStatus.FAILED:
@@ -407,7 +407,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
                 'data': {'instance': data},
                 'object_mapper': self._to_instance}
         instance_id = self._post_request(value_dict).id
-        self.block_until_create_instance_ready(instance_id)
+        self.block_until_instance_ready(instance_id)
         return self.get_instance(instance_id)
 
     def create_instance_no_poll(self, instance):
@@ -443,7 +443,9 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         data = {'resize': {'volume': {'size': size}}}
         value_dict = {'url': '/instances/%s/action' % instance_id,
                 'data': data}
-        return self._post_request(value_dict)
+        res = self._post_request(value_dict)
+        self.block_until_instance_ready(instance_id)
+        return res
 
     def resize_instance(self, instance_id, flavorRef):
         instance_id = self._resolve_instance_id(instance_id)
@@ -451,7 +453,9 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         data = {'resize': {'flavorRef': flavorRef}}
         value_dict = {'url': '/instances/%s/action' % instance_id,
                 'data': data}
-        return self._post_request(value_dict)
+        res = self._post_request(value_dict)
+        self.block_until_instance_ready(instance_id)
+        return res
 
     def create_databases(self, instance_id, databases):
         instance_id = self._resolve_instance_id(instance_id)

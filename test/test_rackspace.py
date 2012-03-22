@@ -44,7 +44,6 @@ class DatabaseFileFixtures(FileFixtures):
                                                     fixtures_type='database',
                                                     sub_dir=sub_dir)
 
-
 class RackspaceTests(unittest.TestCase):
     def setUp(self):
         RackspaceDatabaseDriver.connectionCls.conn_classes = (
@@ -210,7 +209,6 @@ class RackspaceTests(unittest.TestCase):
         self.assertEqual(result, True)
         result = self.driver.has_root_enabled('1234567')
         self.assertEqual(result, False)
-
 
 class RackspaceMockHttp(MockHttpTestCase):
     auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -478,7 +476,9 @@ class RackspaceIntegrationTests(unittest.TestCase):
     def test_4_resize_instance_volume(self):
         instance = self.driver.list_instances()[0]
         self.assertNotEqual(instance.size, 4)
+
         self.driver.resize_instance_volume(instance, 4)
+
         updated_instance = self.driver.get_instance(instance)
         self.assertEqual(updated_instance.size, 4)
 
@@ -486,7 +486,7 @@ class RackspaceIntegrationTests(unittest.TestCase):
         med_flavor = self.driver.get_flavor(2)
         instance = self.driver.list_instances()[0]
         self.assertNotEqual(instance.flavorRef, med_flavor.href)
-        self.driver.restart_instance(instance, med_flavor)
+        self.driver.resize_instance(instance, med_flavor)
         instance = self.driver.get_instance(instance)
         self.assertEqual(instance.flavorRef, med_flavor.href)
 
@@ -497,7 +497,6 @@ class RackspaceIntegrationTests(unittest.TestCase):
        self.assertEqual(user.name, 'root')
        instance = self.driver.get_instance(instance)
        self.assertTrue(instance.rootEnabled)
-
 
 if __name__ == '__main__':
     sys.exit(unittest.main(verbosity=5))
