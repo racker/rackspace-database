@@ -277,6 +277,15 @@ class RackspaceMockHttp(MockHttpTestCase):
 
         raise NotImplementedError('')
 
+    def _v1_0_586067_instances_1234567(\
+            self, method, url, body, headers):
+        if method == 'GET':
+            body = self.fixtures.load('get_instance_resize_volume.json')
+            return (httplib.OK, body, self.json_content_headers,
+                    httplib.responses[httplib.OK])
+
+        raise NotImplementedError('')
+
     def _v1_0_586067_instances_12345678_action(\
             self, method, url, body, headers):
         if method == 'POST':
@@ -286,6 +295,15 @@ class RackspaceMockHttp(MockHttpTestCase):
             self.assertEqual(json.loads(body), data)
             return (httplib.NO_CONTENT, body, self.json_content_headers,
                     httplib.responses[httplib.NO_CONTENT])
+
+        raise NotImplementedError('')
+
+    def _v1_0_586067_instances_12345678(\
+            self, method, url, body, headers):
+        if method == 'GET':
+            body = self.fixtures.load('get_instance.json')
+            return (httplib.OK, body, self.json_content_headers,
+                    httplib.responses[httplib.OK])
 
         raise NotImplementedError('')
 

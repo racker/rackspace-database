@@ -1,0 +1,49 @@
+{
+    "instance": {
+        "status": "ACTIVE", 
+        "updated": "2012-02-29T22:16:28Z", 
+        "name": "a_rack_instance", 
+        "links": [
+            {
+                "href": "http://ord.databases.api.rackspacecloud.com/v1.0/586067/instances/68345c52", 
+                "rel": "self"
+            }, 
+            {
+                "href": "http://ord.databases.api.rackspacecloud.com/instances/68345c52", 
+                "rel": "bookmark"
+            }
+        ], 
+        "created": "2012-02-29T22:16:05Z", 
+        "hostname": "1953839507876d271d9b6483eb6da6a805a324eb.rackspaceclouddb.com", 
+        "volume": {
+            "size": 4
+        }, 
+        "databases": [
+            {
+                "collate": "utf8_general_ci", 
+                "character_set": "utf8", 
+                "name": "nextround"
+            }, 
+            {
+                "collate": "utf8_general_ci", 
+                "character_set": "utf8", 
+                "name": "sampledb"
+            }
+        ], 
+        "rootEnabled": false, 
+        "flavor": {
+            "id": "1", 
+            "links": [
+                {
+                    "href": "http://ord.databases.api.rackspacecloud.com/v1.0/586067/flavors/1", 
+                    "rel": "self"
+                }, 
+                {
+                    "href": "http://ord.databases.api.rackspacecloud.com/flavors/1", 
+                    "rel": "bookmark"
+                }
+            ]
+        }, 
+        "id": "68345c52"
+    }
+}	
