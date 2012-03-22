@@ -7,6 +7,7 @@ class InstanceStatus(object):
     BLOCKED = 2
     SHUTDOWN = 3
     FAILED = 4
+    RESIZE = 5
 
 
 class Instance(object):
