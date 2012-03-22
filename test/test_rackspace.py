@@ -43,7 +43,7 @@ class DatabaseFileFixtures(FileFixtures):
         super(DatabaseFileFixtures, self).__init__(
                                                     fixtures_type='database',
                                                     sub_dir=sub_dir)
-
+'''
 class RackspaceTests(unittest.TestCase):
     def setUp(self):
         RackspaceDatabaseDriver.connectionCls.conn_classes = (
@@ -418,7 +418,7 @@ class RackspaceMockHttp(MockHttpTestCase):
             return (httplib.OK, body, self.json_content_headers,
                     httplib.responses[httplib.OK])
         raise NotImplementedError('')
-
+'''
 
 class RackspaceIntegrationTests(unittest.TestCase):
 
@@ -497,6 +497,35 @@ class RackspaceIntegrationTests(unittest.TestCase):
        self.assertEqual(user.name, 'root')
        instance = self.driver.get_instance(instance)
        self.assertTrue(instance.rootEnabled)
+
+    def test_7_delete_user(self):
+        instance = self.driver.list_instances()[0]
+        users = self.driver.list_users(instance)
+        self.assertEqual(len(users), 4)
+
+        self.driver.delete_user(instance, 'yau')
+        updated_user_names = [u.name for u in
+                self.driver.list_users(instance)]
+        self.assertEqual(len(updated_user_names), 3)
+        self.assertEqual(set(updated_user_names),
+                set(['a_user', 'another_user', 'root']))
+
+    def test_8_delete_database(self):
+        instance = self.driver.list_instances()[0]
+        self.driver.delete_database(instance, 'a_database')
+
+        database_names = [d.name for d in
+                self.driver.list_databases(instance)]
+        self.assertEqual(len(database_names), 2)
+        self.assertEqual(set(database_names),
+                set(['another_database', 'yet_another_database']))
+
+    def test_9_delete_instance(self):
+        instance = self.driver.list_instances()[0]
+        self.driver.delete_instance(instance)
+        ret_instances = self.driver.list_instances()
+        self.assertEqual(len(ret_instances), 0)
+
 
 if __name__ == '__main__':
     sys.exit(unittest.main(verbosity=5))
