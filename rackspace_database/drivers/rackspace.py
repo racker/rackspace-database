@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import sys
+import time
 
 try:
     import simplejson as json
@@ -117,6 +118,8 @@ class RackspaceDatabaseConnection(OpenStackBaseConnection):
         self.api_version = API_VERSION
         self.database_url = ex_force_base_url
         self.accept_format = 'application/json'
+        self.poll_interval = 2
+        self.timeout = 80
         super(RackspaceDatabaseConnection, self).__init__(user_id, key,
                                 secure=secure,
                                 ex_force_base_url=ex_force_base_url,
@@ -143,6 +146,14 @@ class RackspaceDatabaseConnection(OpenStackBaseConnection):
             raw=raw
         )
 
+    def _block_until_ready(self, instance_id, has_completed):
+        total_time = 0
+        while not has_completed(instance_id):
+            total_time += self.poll_interval
+            if total_time >= self.timeout:
+                raise LibcloudError('Job did not complete in %s seconds' %
+                                                        (self.timeout))
+            time.sleep(self.poll_interval)
 
 class RackspaceDatabaseDriver(DatabaseDriver):
     """
@@ -176,6 +187,34 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         if self._ex_force_auth_version:
             rv['ex_force_auth_version'] = self._ex_force_auth_version
         return rv
+    def block_until_delete_instance_ready(self, instance_id):
+        def has_completed(i_id):
+            try:
+                instance = self.get_instance(i_id)
+                if instance.status == InstanceStatus.FAILED:
+                    raise LibcloudError("Instance entered an FAILED state.",
+                                                                driver=self.driver)
+                return instance.status == InstanceStatus.ACTIVE
+            except Exception, e:
+                data = {'itemNotFound':
+                         {'message': 'The resource could not be found.',
+                            'code': 404}}
+                if str(e) == str(data):
+                     return True
+                else:
+                     raise Exception(e)
+        self.connection._block_until_ready(instance_id, has_completed)
+
+    def block_until_create_instance_ready(self, instance_id):
+        def has_completed(i_id):
+            i = self.get_instance(i_id)
+            if i.status == InstanceStatus.FAILED:
+                raise LibcloudError("Instance entered an FAILED state.",
+                                                        driver=self.driver)
+            return i.status == InstanceStatus.ACTIVE
+        self.connection._block_until_ready(instance_id, has_completed)
+
+
 
     def _get_request(self, value_dict):
         key = None
@@ -254,6 +293,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
     def _delete_request(self, value_dict):
         return self._request(value_dict, 'DELETE')
 
+
     def __extract_flavor_ref(self, obj):
         for link in obj['links']:
             if link['rel'] == 'self':
@@ -293,7 +333,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
                 databases=databases)
 
     def _from_instance(self, instance):
-        d = {'flavorRef': instance.flavorRef,
+        d = {'flavorRef': self._resolve_flavor_ref(instance.flavorRef),
             'volume': {'size': instance.size}
         }
         if instance.id:
@@ -366,9 +406,27 @@ class RackspaceDatabaseDriver(DatabaseDriver):
                 'namespace': 'instance',
                 'data': {'instance': data},
                 'object_mapper': self._to_instance}
+        instance_id = self._post_request(value_dict).id
+        self.block_until_create_instance_ready(instance_id)
+        return self.get_instance(instance_id)
+
+    def create_instance_no_poll(self, instance):
+        data = self._from_instance(instance)
+
+        value_dict = {'url': '/instances',
+                'namespace': 'instance',
+                'data': {'instance': data},
+                'object_mapper': self._to_instance}
         return self._post_request(value_dict)
 
     def delete_instance(self, instance_id):
+        instance_id = self._resolve_instance_id(instance_id)
+        value_dict = {'url': '/instances/%s' % instance_id}
+        res = self._delete_request(value_dict)
+        self.block_until_delete_instance_ready(instance_id)
+        return res
+
+    def delete_instance_no_poll(self, instance_id):
         instance_id = self._resolve_instance_id(instance_id)
         value_dict = {'url': '/instances/%s' % instance_id}
         return self._delete_request(value_dict)
