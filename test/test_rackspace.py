@@ -43,7 +43,8 @@ class DatabaseFileFixtures(FileFixtures):
         super(DatabaseFileFixtures, self).__init__(
                                                     fixtures_type='database',
                                                     sub_dir=sub_dir)
-'''
+
+
 class RackspaceTests(unittest.TestCase):
     def setUp(self):
         RackspaceDatabaseDriver.connectionCls.conn_classes = (
@@ -209,6 +210,7 @@ class RackspaceTests(unittest.TestCase):
         self.assertEqual(result, True)
         result = self.driver.has_root_enabled('1234567')
         self.assertEqual(result, False)
+
 
 class RackspaceMockHttp(MockHttpTestCase):
     auth_fixtures = DatabaseFileFixtures('rackspace/auth')
@@ -436,7 +438,7 @@ class RackspaceMockHttp(MockHttpTestCase):
             return (httplib.OK, body, self.json_content_headers,
                     httplib.responses[httplib.OK])
         raise NotImplementedError('')
-'''
+
 
 class RackspaceIntegrationTests(unittest.TestCase):
 
@@ -480,7 +482,8 @@ class RackspaceIntegrationTests(unittest.TestCase):
             (User('a_user', password='password'),
                 [Database('a_database'), Database('another_database')]),
             (User('another_user', password='password'),
-                [Database('another_database'), Database('yet_another_database')])
+                [Database('another_database'),
+                    Database('yet_another_database')])
         ])
         self.driver.create_user(instance,
                 User('yau', password='password'),
@@ -509,12 +512,12 @@ class RackspaceIntegrationTests(unittest.TestCase):
         self.assertEqual(instance.flavorRef, med_flavor.href)
 
     def test_6_enable_root(self):
-       instance = self.driver.list_instances()[0]
-       self.assertFalse(instance.rootEnabled)
-       user = self.driver.enable_root(instance)
-       self.assertEqual(user.name, 'root')
-       instance = self.driver.get_instance(instance)
-       self.assertTrue(instance.rootEnabled)
+        instance = self.driver.list_instances()[0]
+        self.assertFalse(instance.rootEnabled)
+        user = self.driver.enable_root(instance)
+        self.assertEqual(user.name, 'root')
+        instance = self.driver.get_instance(instance)
+        self.assertTrue(instance.rootEnabled)
 
     def test_7_delete_user(self):
         instance = self.driver.list_instances()[0]
@@ -543,7 +546,6 @@ class RackspaceIntegrationTests(unittest.TestCase):
         self.driver.delete_instance(instance)
         ret_instances = self.driver.list_instances()
         self.assertEqual(len(ret_instances), 0)
-
 
 if __name__ == '__main__':
     sys.exit(unittest.main(verbosity=5))

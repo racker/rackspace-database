@@ -45,7 +45,7 @@ class RackspaceDatabaseValidationError(LibcloudError):
         self.message = message
         self.details = details
         super(RackspaceDatabaseValidationError, self).__init__(value=message,
-                                                                 driver=driver)
+                        driver=driver)
 
     def __repr__(self):
         string = '<ValidationError type=%s, ' % (self.type)
@@ -155,6 +155,7 @@ class RackspaceDatabaseConnection(OpenStackBaseConnection):
                                                         (self.timeout))
             time.sleep(self.poll_interval)
 
+
 class RackspaceDatabaseDriver(DatabaseDriver):
     """
     Base Rackspace Database driver.
@@ -187,22 +188,23 @@ class RackspaceDatabaseDriver(DatabaseDriver):
         if self._ex_force_auth_version:
             rv['ex_force_auth_version'] = self._ex_force_auth_version
         return rv
+
     def block_until_delete_instance_ready(self, instance_id):
         def has_completed(i_id):
             try:
                 instance = self.get_instance(i_id)
                 if instance.status == InstanceStatus.FAILED:
                     raise LibcloudError("Instance entered an FAILED state.",
-                                                                driver=self.driver)
+                                            driver=self.driver)
                 return instance.status == InstanceStatus.ACTIVE
             except Exception, e:
                 data = {'itemNotFound':
                          {'message': 'The resource could not be found.',
                             'code': 404}}
                 if str(e) == str(data):
-                     return True
+                    return True
                 else:
-                     raise Exception(e)
+                    raise Exception(e)
         self.connection._block_until_ready(instance_id, has_completed)
 
     def block_until_instance_ready(self, instance_id):
@@ -213,8 +215,6 @@ class RackspaceDatabaseDriver(DatabaseDriver):
                                                         driver=self.driver)
             return i.status == InstanceStatus.ACTIVE
         self.connection._block_until_ready(instance_id, has_completed)
-
-
 
     def _get_request(self, value_dict):
         key = None
@@ -293,7 +293,6 @@ class RackspaceDatabaseDriver(DatabaseDriver):
     def _delete_request(self, value_dict):
         return self._request(value_dict, 'DELETE')
 
-
     def __extract_flavor_ref(self, obj):
         for link in obj['links']:
             if link['rel'] == 'self':
@@ -364,7 +363,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 
     def _resolve_instance_id(self, instance_id):
         if type(instance_id) == str:
-           return instance_id
+            return instance_id
         elif type(instance_id) == Instance:
             return instance_id.id
 
@@ -485,6 +484,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 
     def create_users(self, instance_id, user_databases_pairs):
         instance_id = self._resolve_instance_id(instance_id)
+
         def _from_user_databases_pair((user, databases)):
             data = {
                 'databases': [self._from_database(d) for d in databases],
@@ -542,6 +542,7 @@ class RackspaceDatabaseDriver(DatabaseDriver):
 
     def has_root_enabled(self, instance_id):
         instance_id = self._resolve_instance_id(instance_id)
+
         def id(x, value_dict):
             return x
         value_dict = {'url': '/instances/%s/root' % instance_id,
