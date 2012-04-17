@@ -30,7 +30,8 @@ from rackspace_database.base import (DatabaseDriver, Instance,
                             InstanceStatus, Flavor, Database, User)
 
 from libcloud.common.rackspace import AUTH_URL_US
-from libcloud.common.openstack import OpenStackBaseConnection
+from libcloud.common.openstack import OpenStackBaseConnection,\
+    OpenStackDriverMixin
 
 API_VERSION = 'v1.0'
 API_URL = 'https://ord.databases.api.rackspacecloud.com/%s' % (API_VERSION)
@@ -112,16 +113,13 @@ class RackspaceDatabaseConnection(OpenStackBaseConnection):
     auth_url = AUTH_URL_US
     _url_key = "database_url"
 
-    def __init__(self, user_id, key, secure=False, ex_force_base_url=API_URL,
-                 ex_force_auth_url=None, ex_force_auth_version='2.0'):
+    def __init__(self, user_id, key, secure=True, ex_force_region='ord',
+                 **kwargs):
+        super(RackspaceDatabaseConnection, self).__init__(user_id, key, secure,
+                                                          **kwargs)
         self.api_version = API_VERSION
-        self.database_url = ex_force_base_url
         self.accept_format = 'application/json'
-        super(RackspaceDatabaseConnection, self).__init__(user_id, key,
-                                secure=secure,
-                                ex_force_base_url=ex_force_base_url,
-                                ex_force_auth_url=ex_force_auth_url,
-                                ex_force_auth_version=ex_force_auth_version)
+        self._ex_force_region = ex_force_region
 
     def request(self, action, params=None, data='', headers=None, method='GET',
                 raw=False):
@@ -143,8 +141,24 @@ class RackspaceDatabaseConnection(OpenStackBaseConnection):
             raw=raw
         )
 
+    def get_endpoint(self):
+        region = self._ex_force_region
 
-class RackspaceDatabaseDriver(DatabaseDriver):
+        if '1.1' in self._auth_version:
+            ep = self.service_catalog.get_endpoint(name='cloudDatabases',
+                                                   region=region.upper())
+            return ep['publicURL']
+
+        if '2.0' in self._auth_version:
+            ep = self.service_catalog.get_endpoint(
+                name='cloudDatabases', service_type='rax:database',
+                region=region.upper())
+            return ep['publicURL']
+
+        raise LibcloudError('Could not find specified endpoint')
+
+
+class RackspaceDatabaseDriver(DatabaseDriver, OpenStackDriverMixin):
     """
     Base Rackspace Database driver.
 
@@ -153,29 +167,16 @@ class RackspaceDatabaseDriver(DatabaseDriver):
     connectionCls = RackspaceDatabaseConnection
 
     def __init__(self, *args, **kwargs):
-        self._ex_force_base_url = kwargs.pop('ex_force_base_url', None)
-        self._ex_force_auth_url = kwargs.pop('ex_force_auth_url', None)
-        self._ex_force_auth_version = kwargs.pop('ex_force_auth_version', None)
+        OpenStackDriverMixin.__init__(self, *args, **kwargs)
+        self._ex_force_region = kwargs.pop('ex_force_region', None)
         super(RackspaceDatabaseDriver, self).__init__(*args, **kwargs)
 
-        self.connection._populate_hosts_and_request_paths()
-        tenant_id = self.connection.service_catalog.get_endpoint(
-                service_type='compute', name='cloudServers')['tenantId']
-
-        url = '%s/%s' % (API_URL, tenant_id)
-        conn = self.connection
-        (conn.host, conn.port, conn.secure,
-            conn.request_path) = conn._tuple_from_url(url)
-
     def _ex_connection_class_kwargs(self):
-        rv = {}
-        if self._ex_force_base_url:
-            rv['ex_force_base_url'] = self._ex_force_base_url
-        if self._ex_force_auth_url:
-            rv['ex_force_auth_url'] = self._ex_force_auth_url
-        if self._ex_force_auth_version:
-            rv['ex_force_auth_version'] = self._ex_force_auth_version
-        return rv
+        kwargs = self.openstack_connection_kwargs()
+        if self._ex_force_region:
+            kwargs['ex_force_region'] = self._ex_force_region
+
+        return kwargs
 
     def _get_request(self, value_dict):
         key = None
