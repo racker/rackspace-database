@@ -40,9 +40,8 @@ FIXTURES_ROOT['database'] = pjoin(os.getcwd(), 'test/fixtures')
 
 class DatabaseFileFixtures(FileFixtures):
     def __init__(self, sub_dir=''):
-        super(DatabaseFileFixtures, self).__init__(
-                                                    fixtures_type='database',
-                                                    sub_dir=sub_dir)
+        super(DatabaseFileFixtures, self).__init__(fixtures_type='database',
+                                                   sub_dir=sub_dir)
 
 
 class RackspaceTests(unittest.TestCase):
@@ -54,8 +53,7 @@ class RackspaceTests(unittest.TestCase):
 
         RackspaceMockHttp.type = None
         self.driver = RackspaceDatabaseDriver(key=RACKSPACE_PARAMS[0],
-                                                secret=RACKSPACE_PARAMS[1],
-                ex_force_base_url='http://www.todo.com')
+                                                secret=RACKSPACE_PARAMS[1])
 
     def test_list_flavors(self):
         results = self.driver.list_flavors()
@@ -216,6 +214,11 @@ class RackspaceMockHttp(MockHttpTestCase):
     auth_fixtures = DatabaseFileFixtures('rackspace/auth')
     fixtures = DatabaseFileFixtures('rackspace/v1.0')
     json_content_headers = {'content-type': 'application/json; charset=UTF-8'}
+
+    def _v1_1_auth(self, method, url, body, headers):
+        body = self.auth_fixtures.load('_v1_1_tokens.json')
+        return (httplib.OK, body, self.json_content_headers,
+                httplib.responses[httplib.OK])
 
     def _v2_0_tokens(self, method, url, body, headers):
         body = self.auth_fixtures.load('_v2_0_tokens.json')

@@ -67,7 +67,8 @@ class DatabaseDriver(object):
 
     connectionCls = ConnectionUserAndKey
 
-    def __init__(self, key, secret=None, secure=True, host=None, port=None):
+    def __init__(self, key, secret=None, secure=True, host=None, port=None,
+                 **kwargs):
         self.key = key
         self.secret = secret
         self.secure = secure
